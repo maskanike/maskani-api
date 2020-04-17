@@ -19,6 +19,14 @@ exports.register = [
     .withMessage('IS_EMPTY')
     .isEmail()
     .withMessage('EMAIL_IS_NOT_VALID'),
+  check('msisdn')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isMobilePhone()
+    .withMessage('IS_EMPTY')
+    .isMobilePhone()
+    .withMessage('MSISDN_IS_NOT_VALID'),
   check('password')
     .exists()
     .withMessage('MISSING')
