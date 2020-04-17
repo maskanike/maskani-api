@@ -3,14 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon app.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "debug": "~2.6.9",
+    "dotenv-safe": "^8.2.0",
     "express": "~4.16.1",
     "express-validator": "^6.4.0",
+    "helmet": "^3.22.0",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
+    "passport": "^0.4.1",
     "sequelize": "^5.21.6",
     "sequelize-cli": "^5.5.1",
     "trim-request": "^1.0.6",
