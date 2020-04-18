@@ -1,10 +1,147 @@
 const { matchedData } = require('express-validator')
-const { User } = require('../../models');
+const { User, UserAccess } = require('../../models');
 const auth = require('../../middleware/auth')
 const emailer = require('../../middleware/emailer')
 const utils = require('../../middleware/utils')
 const uuid = require('uuid')
 const jwt = require('jsonwebtoken')
+
+const HOURS_TO_BLOCK = 2
+const LOGIN_ATTEMPTS = 5
+
+/*********************
+ * Private functions *
+ *********************/
+
+/**
+ * Saves a new user access and then returns token
+ * @param {Object} req - request object
+ * @param {Object} user - user object
+ */
+const saveUserAccessAndReturnToken = async (req, user) => {
+  return new Promise((resolve, reject) => {
+    const userAccess = {
+      email: user.email,
+      ip: utils.getIP(req),
+      browser: utils.getBrowserInfo(req),
+      country: utils.getCountry(req)
+    }
+    UserAccess.create(userAccess)
+    .then(() => {
+      const userInfo = setUserInfo(user)
+      // Returns data with access token
+      resolve({
+        token: generateToken(user.id),
+        user: userInfo
+      })
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message))
+    })
+  })
+}
+
+/**
+ * Saves login attempts to dabatabse
+ * @param {Object} user - user object
+ */
+const saveLoginAttemptsToDB = async (user) => {
+  return new Promise((resolve, reject) => {
+    User.update(user,{ where: { id: user.id }})
+    .then(() => {
+      resolve(true)
+    }) 
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message))
+    })
+  })
+}
+
+/**
+ * Checks that login attempts are greater than specified in constant and also that blockexpires is less than now
+ * @param {Object} user - user object
+ */
+const blockIsExpired = (user) =>
+  user.loginAttempts > LOGIN_ATTEMPTS && user.blockExpires <= new Date()
+
+/**
+ *
+ * @param {Object} user - user object.
+ */
+const checkLoginAttemptsAndBlockExpires = async (user) => {
+  return new Promise((resolve, reject) => {
+    // Let user try to login again after blockexpires, resets user loginAttempts
+    if (blockIsExpired(user)) {
+      user.loginAttempts = 0
+      user.save()
+      .then(result => {
+        if (result) {
+          resolve(true)
+          }
+        })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+        });
+    } else {
+      // User is not blocked, check password (normal behaviour)
+      resolve(true)
+    }
+  })
+}
+
+/**
+ * Checks if blockExpires from user is greater than now
+ * @param {Object} user - user object
+ */
+const userIsBlocked = async (user) => {
+  return new Promise((resolve, reject) => {
+    if (user.blockExpires > new Date()) {
+      reject(utils.buildErrObject(409, 'BLOCKED_USER'))
+    }
+    resolve(true)
+  })
+}
+
+/**
+ * Finds user by email
+ * @param {string} email - user´s email
+ */
+const findUser = async (email) => {
+  return new Promise((resolve, reject) => {
+    User.findOne({ 
+      where: { email },
+      attributes: ['password', 'loginAttempts', 'blockExpires', 'name', 'email', 'role', 'verified', 'verification'],
+    })
+      .then(user => {
+        if(!user) {
+          reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
+        }
+        resolve(user)
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+      });
+  })
+}
+
+/**
+ * Finds user by ID
+ * @param {string} id - user´s id
+ */
+const findUserById = async (userId) => {
+  return new Promise((resolve, reject) => {
+    User.findByPk(userId)
+    then(user => {
+      if(!user) {
+        reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
+      }
+      resolve(user)
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message))
+    });
+  })
+}
 
 /**
  * Generates a token
@@ -89,6 +226,35 @@ const returnRegisterToken = (item, userInfo) => {
     return data
   }  
 
+/********************
+ * Public functions *
+ ********************/
+
+/**
+ * Login function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.login = async (req, res) => {
+  try {
+    const data = matchedData(req)
+    const user = await findUser(data.email)
+    await userIsBlocked(user)
+    await checkLoginAttemptsAndBlockExpires(user)
+    const isPasswordMatch = await auth.checkPassword(data.password, user)
+    if (!isPasswordMatch) {
+      utils.handleError(res, await passwordsDoNotMatch(user))
+    } else {
+      // all ok, register access and return token
+      user.loginAttempts = 0
+      await saveLoginAttemptsToDB(user)
+      res.status(200).json(await saveUserAccessAndReturnToken(req, user))
+    }
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
 /**
  * Register function called by route
  * @param {Object} req - request object
@@ -109,3 +275,94 @@ exports.register = async (req, res) => {
       utils.handleError(res, error)
     }
   }
+
+
+/**
+ * Verify function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.verify = async (req, res) => {
+  try {
+    req = matchedData(req)
+    const user = await verificationExists(req.id)
+    res.status(200).json(await verifyUser(user))
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Forgot password function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.forgotPassword = async (req, res) => {
+  try {
+    // Gets locale from header 'Accept-Language'
+    const locale = req.getLocale()
+    const data = matchedData(req)
+    await findUser(data.email)
+    const item = await saveForgotPassword(req)
+    emailer.sendResetPasswordEmailMessage(locale, item)
+    res.status(200).json(forgotPasswordResponse(item))
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Reset password function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.resetPassword = async (req, res) => {
+  try {
+    const data = matchedData(req)
+    const forgotPassword = await findForgotPassword(data.id)
+    const user = await findUserToResetPassword(forgotPassword.email)
+    await updatePassword(data.password, user)
+    const result = await markResetPasswordAsUsed(req, forgotPassword)
+    res.status(200).json(result)
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Refresh token function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.getRefreshToken = async (req, res) => {
+  try {
+    const tokenEncrypted = req.headers.authorization
+      .replace('Bearer ', '')
+      .trim()
+    let userId = await getUserIdFromToken(tokenEncrypted)
+    userId = await utils.isIDGood(userId)
+    const user = await findUserById(userId)
+    const token = await saveUserAccessAndReturnToken(req, user)
+    // Removes user info from response
+    delete token.user
+    res.status(200).json(token)
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Roles authorization function called by route
+ * @param {Array} roles - roles specified on the route
+ */
+exports.roleAuthorization = (roles) => async (req, res, next) => {
+  try {
+    const data = {
+      id: req.user._id,
+      roles
+    }
+    await checkPermissions(data, next)
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}

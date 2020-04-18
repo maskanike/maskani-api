@@ -1,5 +1,105 @@
-const { User } = require('../models');
+const { User, Notification } = require('../models');
 const utils = require('../middleware/utils')
+const Mailgun = require('mailgun-js');
+
+/**
+ * 
+ * @param {Object} data 
+ */
+const logEmail = async(data) => {
+  Notification.create(data);
+}
+
+/**
+ * 
+ * @param {Object} data 
+ * @param {Object} error 
+ */
+const logFailedEmailSending = async(data, err) => {
+  const failedEmail = {
+    message: data.htmlMessage,
+    destination: data.to,
+    type: 'email',
+    error: err,
+    status: 'failed',
+  }
+  logEmail(failedEmail);
+}
+
+/**
+ * 
+ * @param {Object} data 
+ */
+const logSuccessfulEmailSending = async(data) => {
+  const successEmail = {
+    message: data.htmlMessage,
+    destination: data.to,
+    type: 'email',
+    status: 'success',
+  }
+  logEmail(successEmail);
+}
+
+/**
+ * Sends email
+ * @param {Object} data - data
+ * @param {boolean} callback - callback
+ */
+const sendEmail = async (data, callback) => {
+  const mailgun = new Mailgun({
+    apiKey: process.env.EMAIL_SMTP_API_MAILGUN,
+    domain: process.env.EMAIL_SMTP_DOMAIN_MAILGUN
+  });
+  const email = {
+    from: `${data.name} <${from}>`,
+    to: `${data.user.name} <${data.user.email}>`,
+    subject: data.subject,
+    html: data.htmlMessage,
+  };
+
+  mailgun.messages().send(email, async (err) => {
+    if (err) {
+      logFailedEmailSending(data, err);
+      return callback(false)
+    }
+    logSuccessfulEmailSending(data);
+    return callback(true)
+  });
+  transporter.sendMail(mailOptions, (err) => {
+    if (err) {
+      return callback(false)
+    }
+    return callback(true)
+  })
+}
+
+/**
+ * Prepares to send email
+ * @param {string} user - user object
+ * @param {string} subject - subject
+ * @param {string} htmlMessage - html message
+ */
+const prepareToSendEmail = (user, subject, htmlMessage) => {
+  user = {
+    name: user.name,
+    email: user.email,
+    verification: user.verification
+  }
+  const data = {
+    user,
+    subject,
+    htmlMessage
+  }
+  if (process.env.NODE_ENV === 'production') {
+    sendEmail(data, (messageSent) =>
+      messageSent
+        ? console.log(`Email SENT to: ${user.email}`)
+        : console.log(`Email FAILED to: ${user.email}`)
+    )
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log(data)
+  }
+}
 
 module.exports = {
     /**

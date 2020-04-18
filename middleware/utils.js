@@ -1,4 +1,25 @@
 const { validationResult } = require('express-validator')
+const requestIp = require('request-ip')
+
+/**
+ * Gets IP from user
+ * @param {*} req - request object
+ */
+exports.getIP = (req) => requestIp.getClientIp(req)
+
+/**
+ * Gets browser info from user
+ * @param {*} req - request object
+ */
+exports.getBrowserInfo = (req) => req.headers['user-agent']
+
+/**
+ * Gets country from user using CloudFlare header 'cf-ipcountry'
+ * @param {*} req - request object
+ */
+exports.getCountry = (req) =>
+  req.headers['cf-ipcountry'] ? req.headers['cf-ipcountry'] : 'KE'
+
 
 /**
  * Handles error by printing to console in development env and builds and sends an error response
