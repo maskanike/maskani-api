@@ -143,6 +143,157 @@ const findUserById = async (userId) => {
   })
 }
 
+
+/**
+ * Adds one attempt to loginAttempts, then compares loginAttempts with the constant LOGIN_ATTEMPTS, if is less returns wrong password, else returns blockUser function
+ * @param {Object} user - user object
+ */
+const passwordsDoNotMatch = async (user) => {
+  user.loginAttempts += 1
+  await saveLoginAttemptsToDB(user)
+  return new Promise((resolve, reject) => {
+    if (user.loginAttempts <= LOGIN_ATTEMPTS) {
+      resolve(utils.buildErrObject(409, 'WRONG_PASSWORD'))
+    } else {
+      resolve(blockUser(user))
+    }
+    reject(utils.buildErrObject(422, 'ERROR'))
+  })
+}
+
+/**
+ * Checks if verification id exists for user
+ * @param {string} id - verification id
+ */
+const verificationExists = async (id) => {
+  return new Promise((resolve, reject) => {
+    User.findOne({ where : {
+      verification: id,
+      verified: false
+    }})
+    .then(user => {
+      if(user) {
+        reject(utils.buildErrObject(422, 'NOT_FOUND_OR_ALREADY_VERIFIED'))
+      }
+      resolve(user)
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message));
+    })
+  })
+}
+
+/**
+ * Verifies an user
+ * @param {Object} user - user object
+ */
+const verifyUser = async (user) => {
+  return new Promise((resolve, reject) => {
+    user.verified = true
+    user.save((err, item) => {
+      if (err) {
+        reject(utils.buildErrObject(422, err.message))
+      }
+      resolve({
+        email: item.email,
+        verified: item.verified
+      })
+    })
+  })
+}
+
+/**
+ * Marks a request to reset password as used
+ * @param {Object} req - request object
+ * @param {Object} forgot - forgot object
+ */
+const markResetPasswordAsUsed = async (req, forgot) => {
+  return new Promise((resolve, reject) => {
+    forgot.used = true
+    forgot.ipChanged = utils.getIP(req)
+    forgot.browserChanged = utils.getBrowserInfo(req)
+    forgot.countryChanged = utils.getCountry(req)
+    forgot.save((err, item) => {
+      utils.itemNotFound(err, item, reject, 'NOT_FOUND')
+      resolve(utils.buildSuccObject('PASSWORD_CHANGED'))
+    })
+  })
+}
+
+/**
+ * Updates a user password in database
+ * @param {string} password - new password
+ * @param {Object} user - user object
+ */
+const updatePassword = async (password, user) => {
+  return new Promise((resolve, reject) => {
+    user.password = password
+    user.save((err, item) => {
+      utils.itemNotFound(err, item, reject, 'NOT_FOUND')
+      resolve(item)
+    })
+  })
+}
+
+/**
+ * Finds user by email to reset password
+ * @param {string} email - user email
+ */
+const findUserToResetPassword = async (email) => {
+  return new Promise((resolve, reject) => {
+    User.findOne(
+      {
+        email
+      },
+      (err, user) => {
+        utils.itemNotFound(err, user, reject, 'NOT_FOUND')
+        resolve(user)
+      }
+    )
+  })
+}
+
+/**
+ * Checks if a forgot password verification exists
+ * @param {string} id - verification id
+ */
+const findForgotPassword = async (id) => {
+  return new Promise((resolve, reject) => {
+    ForgotPassword.findOne(
+      {
+        verification: id,
+        used: false
+      },
+      (err, item) => {
+        utils.itemNotFound(err, item, reject, 'NOT_FOUND_OR_ALREADY_USED')
+        resolve(item)
+      }
+    )
+  })
+}
+
+/**
+ * Creates a new password forgot
+ * @param {Object} req - request object
+ */
+const saveForgotPassword = async (req) => {
+  return new Promise((resolve, reject) => {
+    const forgot = new ForgotPassword({
+      email: req.body.email,
+      verification: uuid.v4(),
+      ipRequest: utils.getIP(req),
+      browserRequest: utils.getBrowserInfo(req),
+      countryRequest: utils.getCountry(req)
+    })
+    forgot.save((err, item) => {
+      if (err) {
+        reject(utils.buildErrObject(422, err.message))
+      }
+      resolve(item)
+    })
+  })
+}
+
 /**
  * Generates a token
  * @param {Object} user - user object
@@ -299,12 +450,10 @@ exports.verify = async (req, res) => {
  */
 exports.forgotPassword = async (req, res) => {
   try {
-    // Gets locale from header 'Accept-Language'
-    const locale = req.getLocale()
     const data = matchedData(req)
     await findUser(data.email)
     const item = await saveForgotPassword(req)
-    emailer.sendResetPasswordEmailMessage(locale, item)
+    emailer.sendResetPasswordEmailMessage(item)
     res.status(200).json(forgotPasswordResponse(item))
   } catch (error) {
     utils.handleError(res, error)
