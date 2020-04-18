@@ -23,7 +23,7 @@ exports.register = [
     .exists()
     .withMessage('MISSING')
     .not()
-    .isMobilePhone()
+    .isEmpty()
     .withMessage('IS_EMPTY')
     .isMobilePhone()
     .withMessage('MSISDN_IS_NOT_VALID'),

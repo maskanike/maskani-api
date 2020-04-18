@@ -1,4 +1,5 @@
 const { matchedData } = require('express-validator')
+const { User } = require('../../models');
 const auth = require('../../middleware/auth')
 const emailer = require('../../middleware/emailer')
 const utils = require('../../middleware/utils')
@@ -34,9 +35,10 @@ const generateToken = (user) => {
  */
 const setUserInfo = (req) => {
     let user = {
-      _id: req._id,
+      id: req.id,
       name: req.name,
       email: req.email,
+      msisdn: req.msisdn,
       role: req.role,
       verified: req.verified
     }
@@ -56,18 +58,16 @@ const setUserInfo = (req) => {
  */
 const registerUser = async (req) => {
     return new Promise((resolve, reject) => {
-        // TODO use sequelize for this query
-      const user = new User({
+      User.create({
         name: req.name,
         email: req.email,
+        msisdn: req.msisdn,
         password: req.password,
         verification: uuid.v4()
-      })
-      user.save((err, item) => {
-        if (err) {
-          reject(utils.buildErrObject(422, err.message))
-        }
-        resolve(item)
+      }).then(user => {
+        resolve(user)
+      }).catch(err => {
+        reject(utils.buildErrObject(422, err.message))
       })
     })
   }
@@ -102,7 +102,7 @@ exports.register = async (req, res) => {
         const item = await registerUser(req)
         const userInfo = setUserInfo(item)
         const response = returnRegisterToken(item, userInfo)
-        emailer.sendRegistrationEmailMessage(locale, item)
+        emailer.sendRegistrationEmailMessage(item)
         res.status(201).json(response)
       }
     } catch (error) {

@@ -1,3 +1,6 @@
+const { User } = require('../models');
+const utils = require('../middleware/utils')
+
 module.exports = {
     /**
      * Checks User model if user with an specific email exists
@@ -5,33 +8,26 @@ module.exports = {
      */
     async emailExists(email) {
       return new Promise((resolve, reject) => {
-          // TODO make this a sequelize function
-        User.findOne(
-          {
-            email
-          },
-          (err, item) => {
-            itemAlreadyExists(err, item, reject, 'EMAIL_ALREADY_EXISTS')
-            resolve(false)
-          }
-        )
-      })
+        User.findOne({ where: { email }})
+          .then(item => {
+            if(item){
+              reject(utils.buildErrObject(422, 'EMAIL_ALREADY_EXISTS'))
+            }
+            resolve(false);
+          })
+          .catch(err => {
+            reject(utils.buildErrObject(422, err.message));
+          });
+      });
     },
 
     /**
    * Sends registration email
-   * @param {string} locale - locale
    * @param {Object} user - user object
    */
-  async sendRegistrationEmailMessage(locale, user) {
-    i18n.setLocale(locale)
-    const subject = i18n.__('registration.SUBJECT')
-    const htmlMessage = i18n.__(
-      'registration.MESSAGE',
-      user.name,
-      process.env.FRONTEND_URL,
-      user.verification
-    )
+  async sendRegistrationEmailMessage(user) {
+    const subject = "Verify your email at Maskani"
+    const htmlMessage = "<p>Hello %s.</p> <p>Welcome! To verify your email, please click in this link:</p> <p>%s/verify/%s</p> <p>Thank you.</p>"
     prepareToSendEmail(user, subject, htmlMessage)
   }
 }
