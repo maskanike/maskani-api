@@ -1,12 +1,11 @@
 const { matchedData } = require('express-validator')
-const { User, UserAccess } = require('../../models');
+const { User, UserAccess, ForgotPassword } = require('../../models');
 const auth = require('../../middleware/auth')
 const emailer = require('../../middleware/emailer')
 const utils = require('../../middleware/utils')
 const uuid = require('uuid')
 const jwt = require('jsonwebtoken')
 
-const HOURS_TO_BLOCK = 2
 const LOGIN_ATTEMPTS = 5
 
 /*********************
@@ -278,20 +277,38 @@ const findForgotPassword = async (id) => {
  */
 const saveForgotPassword = async (req) => {
   return new Promise((resolve, reject) => {
-    const forgot = new ForgotPassword({
+    const forgot = {
       email: req.body.email,
       verification: uuid.v4(),
       ipRequest: utils.getIP(req),
       browserRequest: utils.getBrowserInfo(req),
       countryRequest: utils.getCountry(req)
-    })
-    forgot.save((err, item) => {
-      if (err) {
-        reject(utils.buildErrObject(422, err.message))
-      }
+    }
+    ForgotPassword.create(forgot)
+    .then((item) => {
       resolve(item)
+    }).catch(err => {
+      reject(utils.buildErrObject(422, err.message));
     })
   })
+}
+
+/**
+ * Builds an object with created forgot password object, if env is development or testing exposes the verification
+ * @param {Object} item - created forgot password object
+ */
+const forgotPasswordResponse = (item) => {
+  let data = {
+    msg: 'RESET_EMAIL_SENT',
+    email: item.email
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    data = {
+      ...data,
+      verification: item.verification
+    }
+  }
+  return data
 }
 
 /**

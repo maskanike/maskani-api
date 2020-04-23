@@ -1,5 +1,5 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.createTable('UserAccesses', {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('ForgotPasswords', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -9,13 +9,16 @@ module.exports = {
     email: {
       type: Sequelize.STRING,
     },
-    ip: {
+    verification: {
       type: Sequelize.STRING,
     },
-    browser: {
+    ipRequest: {
       type: Sequelize.STRING,
     },
-    country: {
+    browserRequest: {
+      type: Sequelize.STRING,
+    },
+    countryRequest: {
       type: Sequelize.STRING,
     },
     createdAt: {
@@ -27,5 +30,5 @@ module.exports = {
       type: Sequelize.DATE,
     },
   }),
-  down: (queryInterface) => queryInterface.dropTable('UserAccesses'),
+  down: (queryInterface) => queryInterface.dropTable('ForgotPasswords'),
 };
