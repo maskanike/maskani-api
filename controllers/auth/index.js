@@ -392,7 +392,46 @@ const returnRegisterToken = (item, userInfo) => {
       user: userInfo
     }
     return data
-  }  
+  } 
+  
+/**
+ * Checks against user if has quested role
+ * @param {Object} data - data object
+ * @param {*} next - next callback
+ */
+const checkPermissions = async (data, next) => {
+  return new Promise((resolve, reject) => {
+    User.findByPk(data.id)
+      .then(user => {
+        if (!user) {
+          return reject(utils.buildErrObject(401, 'NOT_FOUND'))
+        }
+        if (data.roles.indexOf(result.role) > -1) {
+          return resolve(next())
+        }
+        return reject(utils.buildErrObject(401, 'UNAUTHORIZED'))
+      })
+      .catch(err => {
+        return reject(utils.buildErrObject(422, err.message))
+      })
+  })
+}
+
+/**
+ * Gets user id from token
+ * @param {string} token - Encrypted and encoded token
+ */
+const getUserIdFromToken = async (token) => {
+  return new Promise((resolve, reject) => {
+    // Decrypts, verifies and decode token
+    jwt.verify(auth.decrypt(token), process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        reject(utils.buildErrObject(409, 'BAD_TOKEN'))
+      }
+      resolve(decoded.data._id)
+    })
+  })
+}
 
 /********************
  * Public functions *
