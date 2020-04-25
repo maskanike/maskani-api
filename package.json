@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "undo-migrate": "./node_modules/.bin/sequelize db:migrate:undo",
     "migrate": "./node_modules/.bin/sequelize db:migrate",
     "unseed": "./node_modules/.bin/sequelize db:seed:undo:all",
     "seed": "yarn unseed && ./node_modules/.bin/sequelize db:seed:all",

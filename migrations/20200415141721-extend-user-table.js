@@ -4,9 +4,9 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addColumn('Users', 'verification', { type: Sequelize.STRING }, { transaction });
-      await queryInterface.addColumn('Users', 'verified', { type: Sequelize.BOOLEAN, default: false }, { transaction });
-      await queryInterface.addColumn('Users', 'loginAttempts', { type: Sequelize.INTEGER, default: 0 }, { transaction });
-      await queryInterface.addColumn('Users', 'blockExpires', { type: Sequelize.DATE, defaultValue: Sequelize.NOW }, { transaction });
+      await queryInterface.addColumn('Users', 'verified', { type: Sequelize.BOOLEAN, defaultValue: true }, { transaction });
+      await queryInterface.addColumn('Users', 'loginAttempts', { type: Sequelize.INTEGER, defaultValue: 0 }, { transaction });
+      await queryInterface.addColumn('Users', 'blockExpires', { type: Sequelize.DATE, defaultValueValue: Sequelize.NOW }, { transaction });
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();

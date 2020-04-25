@@ -10,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     status: DataTypes.ENUM('active', 'pending', 'deleted'),
-    role: { type: DataTypes.ENUM('admin', 'user'), default: 'user' },
+    role: { type: DataTypes.ENUM('admin', 'user'), defaultValue: 'user' },
     userType: DataTypes.ENUM('landlord', 'agent', 'tenant'),
     verification: DataTypes.STRING,
-    verified: { type: DataTypes.BOOLEAN, default: false },
-    loginAttempts: { type: DataTypes.INTEGER, default: 0 },
-    blockExpires: { type: DataTypes.DATE, default: sequelize.NOW },
+    verified: { type: DataTypes.BOOLEAN, defaultValue: false },
+    loginAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
+    blockExpires: { type: DataTypes.DATE, defaultValue: sequelize.NOW },
   }, {
     hooks: {
       beforeCreate: (user) => {
