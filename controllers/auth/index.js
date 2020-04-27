@@ -65,11 +65,11 @@ const blockUser = async (id) => {
 
 /**
  * Saves login attempts to dabatabse
- * @param {string} id - user's id
- * @param {number} loginAttempts - cummulative user login attempts
+* @param {Object} user - user object
  */
-const saveLoginAttemptsToDB = async (id, loginAttempts) => {
+const saveLoginAttemptsToDB = async (user) => {
   return new Promise((resolve, reject) => {
+    const { loginAttempts, id } = user;
     User.update({ loginAttempts }, { where: { id } })
       .then(() => {
         resolve(true)
@@ -95,11 +95,12 @@ const checkLoginAttemptsAndBlockExpires = async (user) => {
   return new Promise((resolve, reject) => {
     // Let user try to login again after blockexpires, resets user loginAttempts
     if (blockIsExpired(user)) {
+      user.loginAttempts = 0; // update in memory object
       User.update(
-        {loginAttempts: 0},
-        { where: {id: user.id}}
+        { loginAttempts: 0 },
+        { where: {id: user.id }}
       ).then(result => {
-          if (result) {
+          if (result) { 
             resolve(true)
           }
         }).catch(err => {
@@ -149,7 +150,7 @@ const findUser = async (email) => {
 
 /**
  * Finds user by ID
- * @param {string} id - user´s id
+ * @param {number} id - user´s id
  */
 const findUserById = async (userId) => {
   return new Promise((resolve, reject) => {
@@ -172,8 +173,8 @@ const findUserById = async (userId) => {
  * @param {Object} user - user object
  */
 const passwordsDoNotMatch = async (user) => {
-  const loginAttempts = user.loginAttempts + 1
-  await saveLoginAttemptsToDB(user.id, loginAttempts);
+  user.loginAttempts += 1
+  await saveLoginAttemptsToDB(user);
   return new Promise((resolve, reject) => {
     if (user.loginAttempts <= LOGIN_ATTEMPTS) {
       resolve(utils.buildErrObject(409, 'WRONG_PASSWORD'))
@@ -494,7 +495,8 @@ exports.login = async (req, res) => {
       utils.handleError(res, await passwordsDoNotMatch(user))
     } else {
       // all ok, register access and return token
-      await saveLoginAttemptsToDB(user.id, 0)
+      user.loginAttempts = 0
+      await saveLoginAttemptsToDB(user)
       res.status(200).json(await saveUserAccessAndReturnToken(req, user))
     }
   } catch (error) {
