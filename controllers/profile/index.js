@@ -35,12 +35,12 @@ const updateProfileInDB = async (req, id) => {
   return new Promise((resolve, reject) => {
     User.update(
       req,
-      { where: {id}})
-      .then(user => {
-        if(!user){
+      { where: {id}, returning: true, plain: true})
+      .then(result => {
+        if(!result){
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
-        resolve(user)
+        resolve(result[1].dataValues)
       })
       .catch(err => {
         reject(utils.buildErrObject(422, err.message))
@@ -86,7 +86,7 @@ const changePasswordInDB = async (id, req) => {
   return new Promise((resolve, reject) => {
     User.update(
       { password: req.newPassword},
-      { where: { id }})
+      { where: { id }, individualHooks: true })
       .then(user => {
         if(!user) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
@@ -123,8 +123,9 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
+    const { id } = req.user
     req = matchedData(req)
-    res.status(200).json(await updateProfileInDB(req, req.user.id))
+    res.status(200).json(await updateProfileInDB(req, id))
   } catch (error) {
     utils.handleError(res, error)
   }
