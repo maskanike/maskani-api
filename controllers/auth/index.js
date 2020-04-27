@@ -4,8 +4,10 @@ const auth = require('../../middleware/auth')
 const emailer = require('../../middleware/emailer')
 const utils = require('../../middleware/utils')
 const uuid = require('uuid')
+const { addHours } = require('date-fns')
 const jwt = require('jsonwebtoken')
 
+const HOURS_TO_BLOCK = 2
 const LOGIN_ATTEMPTS = 5
 
 /*********************
@@ -41,12 +43,34 @@ const saveUserAccessAndReturnToken = async (req, user) => {
 }
 
 /**
- * Saves login attempts to dabatabse
- * @param {Object} user - user object
+ * Blocks a user by setting blockExpires to the specified date based on constant HOURS_TO_BLOCK
+ * @param {number} id - user's id
  */
-const saveLoginAttemptsToDB = async (user) => {
+const blockUser = async (id) => {
   return new Promise((resolve, reject) => {
-    User.update(user, { where: { id: user.id } })
+    const blockExpires = addHours(new Date(), HOURS_TO_BLOCK)
+    User.update(
+      { blockExpires },
+      { where: { id }}
+    ).then(user => {
+      if (user) {
+        resolve(utils.buildErrObject(409, 'BLOCKED_USER'))
+      }
+      reject(utils.buildErrObject(422, 'USER_TO_BLOCK_NOT_FOUND'))
+    }).catch(err => {
+      reject(utils.buildErrObject(422, err.message))
+    })
+  })
+}
+
+/**
+ * Saves login attempts to dabatabse
+ * @param {string} id - user's id
+ * @param {number} loginAttempts - cummulative user login attempts
+ */
+const saveLoginAttemptsToDB = async (id, loginAttempts) => {
+  return new Promise((resolve, reject) => {
+    User.update({ loginAttempts }, { where: { id } })
       .then(() => {
         resolve(true)
       })
@@ -109,7 +133,7 @@ const findUser = async (email) => {
   return new Promise((resolve, reject) => {
     User.findOne({
       where: { email },
-      attributes: ['password', 'loginAttempts', 'blockExpires', 'name', 'email', 'role', 'verified', 'verification'],
+      attributes: ['password', 'loginAttempts', 'blockExpires', 'name', 'email', 'role', 'verified', 'verification', 'id'],
     })
       .then(user => {
         if (!user) {
@@ -148,13 +172,13 @@ const findUserById = async (userId) => {
  * @param {Object} user - user object
  */
 const passwordsDoNotMatch = async (user) => {
-  user.loginAttempts += 1
-  await saveLoginAttemptsToDB(user)
+  const loginAttempts = user.loginAttempts + 1
+  await saveLoginAttemptsToDB(user.id, loginAttempts);
   return new Promise((resolve, reject) => {
     if (user.loginAttempts <= LOGIN_ATTEMPTS) {
       resolve(utils.buildErrObject(409, 'WRONG_PASSWORD'))
     } else {
-      resolve(blockUser(user))
+      resolve(blockUser(user.id))
     }
     reject(utils.buildErrObject(422, 'ERROR'))
   })
@@ -470,8 +494,7 @@ exports.login = async (req, res) => {
       utils.handleError(res, await passwordsDoNotMatch(user))
     } else {
       // all ok, register access and return token
-      user.loginAttempts = 0
-      await saveLoginAttemptsToDB(user)
+      await saveLoginAttemptsToDB(user.id, 0)
       res.status(200).json(await saveUserAccessAndReturnToken(req, user))
     }
   } catch (error) {
