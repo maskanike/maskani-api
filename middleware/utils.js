@@ -51,6 +51,16 @@ exports.buildErrObject = (code, message) => {
     }
   }
 
+/**
+ * Builds success object
+ * @param {string} message - success text
+ */
+exports.buildSuccObject = (message) => {
+  return {
+    msg: message
+  }
+}
+
 
 /**
  * Builds error for validation files

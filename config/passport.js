@@ -38,10 +38,10 @@ const jwtOptions = {
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
   User.findByPk(payload.data.id)
     .then(user => {
-        return !user ? done(null, false) : done(null, user)
+      return !user ? done(null, false) : done(null, user)
     })
     .catch(err => {
-      done(err, false)
+      return done(err, false)
     });
 })
 
