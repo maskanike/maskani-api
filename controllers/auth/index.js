@@ -71,14 +71,14 @@ const checkLoginAttemptsAndBlockExpires = async (user) => {
   return new Promise((resolve, reject) => {
     // Let user try to login again after blockexpires, resets user loginAttempts
     if (blockIsExpired(user)) {
-      user.loginAttempts = 0
-      user.save()
-        .then(result => {
+      User.update(
+        {loginAttempts: 0},
+        { where: {id: user.id}}
+      ).then(result => {
           if (result) {
             resolve(true)
           }
-        })
-        .catch(err => {
+        }).catch(err => {
           reject(utils.buildErrObject(422, err.message))
         });
     } else {
@@ -423,7 +423,7 @@ const checkPermissions = async (data, next) => {
         if (!user) {
           return reject(utils.buildErrObject(401, 'NOT_FOUND'))
         }
-        if (data.roles.indexOf(result.role) > -1) {
+        if (data.roles.indexOf(user.role) > -1) {
           return resolve(next())
         }
         return reject(utils.buildErrObject(401, 'UNAUTHORIZED'))
@@ -445,7 +445,7 @@ const getUserIdFromToken = async (token) => {
       if (err) {
         reject(utils.buildErrObject(409, 'BAD_TOKEN'))
       }
-      resolve(decoded.data._id)
+      resolve(decoded.data.id)
     })
   })
 }

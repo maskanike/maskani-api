@@ -13,10 +13,16 @@ const auth = require('../../middleware/auth')
  */
 const getProfileFromDB = async (id) => {
   return new Promise((resolve, reject) => {
-    User.findById(id, '-id -updatedAt -createdAt', (err, user) => {
-      utils.itemNotFound(err, user, reject, 'NOT_FOUND')
-      resolve(user)
-    })
+    User.findByPk(id)
+      .then(user => {
+        if (!user) {
+          reject(utils.buildErrObject(422, 'NOT_FOUND'))
+        }
+        resolve(user)
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -27,19 +33,18 @@ const getProfileFromDB = async (id) => {
  */
 const updateProfileInDB = async (req, id) => {
   return new Promise((resolve, reject) => {
-    User.findByIdAndUpdate(
-      id,
+    User.update(
       req,
-      {
-        new: true,
-        runValidators: true,
-        select: '-role -id -updatedAt -createdAt'
-      },
-      (err, user) => {
-        utils.itemNotFound(err, user, reject, 'NOT_FOUND')
+      { where: {id}})
+      .then(user => {
+        if(!user){
+          reject(utils.buildErrObject(422, 'NOT_FOUND'))
+        }
         resolve(user)
-      }
-    )
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -49,9 +54,15 @@ const updateProfileInDB = async (req, id) => {
  */
 const findUser = async (id) => {
   return new Promise((resolve, reject) => {
-    User.findById(id, 'password email', (err, user) => {
-      utils.itemNotFound(err, user, reject, 'USER_DOES_NOT_EXIST')
+    User.findByPk(id, {attributes: ['password', 'email']})
+    .then(user => {
+      if (!user) {
+        reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
+      }
       resolve(user)
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message))
     })
   })
 }
@@ -73,20 +84,18 @@ const passwordsDoNotMatch = async () => {
  */
 const changePasswordInDB = async (id, req) => {
   return new Promise((resolve, reject) => {
-    User.findById(id, '+password', (err, user) => {
-      utils.itemNotFound(err, user, reject, 'NOT_FOUND')
-
-      // Assigns new password to user
-      user.password = req.newPassword
-
-      // Saves in DB
-      user.save((error) => {
-        if (err) {
-          reject(utils.buildErrObject(422, error.message))
+    User.update(
+      { password: req.newPassword},
+      { where: { id }})
+      .then(user => {
+        if(!user) {
+          reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
         resolve(utils.buildSuccObject('PASSWORD_CHANGED'))
       })
-    })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -101,8 +110,7 @@ const changePasswordInDB = async (id, req) => {
  */
 exports.getProfile = async (req, res) => {
   try {
-    const id = await utils.isIDGood(req.user.id)
-    res.status(200).json(await getProfileFromDB(id))
+    res.status(200).json(await getProfileFromDB(req.user.id))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -115,9 +123,8 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const id = await utils.isIDGood(req.user.id)
     req = matchedData(req)
-    res.status(200).json(await updateProfileInDB(req, id))
+    res.status(200).json(await updateProfileInDB(req, req.user.id))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -130,7 +137,7 @@ exports.updateProfile = async (req, res) => {
  */
 exports.changePassword = async (req, res) => {
   try {
-    const id = await utils.isIDGood(req.user.id)
+    const {id} = req.user
     const user = await findUser(id)
     req = matchedData(req)
     const isPasswordMatch = await auth.checkPassword(req.oldPassword, user)
