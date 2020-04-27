@@ -8,7 +8,7 @@ const key = crypto.scryptSync(secret, 'salt', 24)
 const iv = Buffer.alloc(16, 0) // Initialization crypto vector
 
 module.exports = {
-    /**
+  /**
    * Checks is password matches
    * @param {string} password - password
    * @param {Object} user - user object
@@ -16,7 +16,7 @@ module.exports = {
    */
   async checkPassword(password, user) {
     return new Promise((resolve, reject) => {
-      let resp = user.comparePassword(password, (err, isMatch) => {
+      user.comparePassword(password, (err, isMatch) => {
         if (err) {
           reject(this.buildErrObject(422, err.message))
         }
@@ -27,6 +27,7 @@ module.exports = {
       })
     })
   },
+  
   /**
    * Encrypts text
    * @param {string} text - text to encrypt
