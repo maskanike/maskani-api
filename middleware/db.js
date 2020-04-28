@@ -93,10 +93,7 @@ const {
     async getItems(req, model, query) {
       const options = await listInitOptions(req)
       return new Promise((resolve, reject) => {
-          model.findAll({
-              limit: options.limit,
-              offset: options.offset
-          }).then(items => {
+          model.findAll(options).then(items => {
             resolve(cleanPaginationID(items))
           }).catch(err => {
             reject(buildErrObject(422, err.message))
