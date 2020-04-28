@@ -33,7 +33,7 @@ const createItem = async (req) => {
           loginAttempts,
           ...rest
         }) => rest
-        resolve(removeProperties(item.toObject()))
+        resolve(removeProperties(item.dataValues))
       })
     }).catch(err => {
       reject(utils.buildErrObject(422, err.message))
@@ -80,13 +80,13 @@ exports.getItem = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const id = await utils.isIDGood(req.id)
+    const { id } = req;
     const doesEmailExists = await emailer.emailExistsExcludingMyself(
       id,
       req.email
     )
     if (!doesEmailExists) {
-      res.status(200).json(await db.updateItem(id, model.User, req))
+      res.status(200).json(await db.updateItem(id, models.User, req))
     }
   } catch (error) {
     utils.handleError(res, error)
@@ -120,8 +120,7 @@ exports.createItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const id = await utils.isIDGood(req.id)
-    res.status(200).json(await db.deleteItem(id, model.User))
+    res.status(200).json(await db.deleteItem(req.id, models.User))
   } catch (error) {
     utils.handleError(res, error)
   }

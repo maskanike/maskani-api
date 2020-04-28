@@ -1,6 +1,8 @@
-const { User, Notification } = require('../models');
+const { User, Notification, Sequelize } = require('../models');
 const utils = require('../middleware/utils')
 const Mailgun = require('mailgun-js');
+
+const Op = Sequelize.Op;
 
 /**
  * 
@@ -120,6 +122,28 @@ module.exports = {
           });
       });
     },
+
+
+  /**
+   * Checks User model if user with an specific email exists but excluding user id
+   * @param {string} id - user id
+   * @param {string} email - user email
+   */
+  async emailExistsExcludingMyself(id, email) {
+    return new Promise((resolve, reject) => {
+      User.findOne({
+          where: { email, id: { [Op.ne]: id }}
+      }).then(item => {
+        if(item){
+          reject(utils.buildErrObject(422, 'EMAIL_ALREADY_EXISTS'))
+        }
+        resolve(false);
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message));
+      });
+    })
+  },
 
     /**
    * Sends registration email

@@ -1,7 +1,6 @@
 const {
     buildSuccObject,
     buildErrObject,
-    itemNotFound
   } = require('../middleware/utils')
   
   /**
@@ -142,15 +141,15 @@ const {
       return new Promise((resolve, reject) => {
         model.update(
           req,
-          { where: {id}, returning: true, plain: true }
+          { where: { id }, returning: true, plain: true }
           ).then(result => {
             if(!result){
-              reject(utils.buildErrObject(422, 'NOT_FOUND'))
+              reject(buildErrObject(422, 'NOT_FOUND'))
             }
             resolve(result[1].dataValues)
           })
           .catch(err => {
-            reject(utils.buildErrObject(422, err.message))
+            reject(buildErrObject(422, err.message))
           })
       })
     },
@@ -165,11 +164,11 @@ const {
             where: { id }
         }).then(result => {
             if(!result){
-              reject(utils.buildErrObject(422, 'NOT_FOUND'))
+              reject(buildErrObject(422, 'NOT_FOUND'))
             }
             resolve(buildSuccObject('DELETED'))
           }).catch(err => {
-            reject(utils.buildErrObject(422, err.message))
+            reject(buildErrObject(422, err.message))
           })
       })
     }
