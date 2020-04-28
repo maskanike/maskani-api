@@ -1,5 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
   const Tenant = sequelize.define('Tenant', {
+    name: DataTypes.STRING,
+    email: DataTypes.STRING,
+    phone: { type: DataTypes.STRING, field: 'msisdn' },
     rent: DataTypes.INTEGER,
     deposit: DataTypes.INTEGER,
     balance: DataTypes.INTEGER,
@@ -11,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Tenant.associate = (models) => {
     Tenant.belongsTo(models.Flat);
-    Tenant.belongsTo(models.User);
     Tenant.hasOne(models.Statement);
     Tenant.hasOne(models.Unit);
     Tenant.hasMany(models.Receipt);
