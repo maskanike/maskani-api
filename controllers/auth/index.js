@@ -587,7 +587,6 @@ exports.getRefreshToken = async (req, res) => {
       .replace('Bearer ', '')
       .trim()
     let userId = await getUserIdFromToken(tokenEncrypted)
-    userId = await utils.isIDGood(userId)
     const user = await findUserById(userId)
     const token = await saveUserAccessAndReturnToken(req, user)
     // Removes user info from response

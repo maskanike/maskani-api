@@ -120,12 +120,12 @@ const {
      */
     async createItem(req, model) {
       return new Promise((resolve, reject) => {
-        model.create(req, (err, item) => {
-          if (err) {
+        model.create(req).then(item => {
+            resolve(item)
+          })
+          .catch(err => {
             reject(buildErrObject(422, err.message))
-          }
-          resolve(item)
-        })
+          })
       })
     },
   

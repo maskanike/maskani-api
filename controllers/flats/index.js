@@ -1,7 +1,9 @@
-const { Flat } = require('../../models')
+const { Flat, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
+
+const Op = Sequelize.Op;
 
 /*********************
  * Private functions *
@@ -34,7 +36,7 @@ const flatExistsExcludingItself = async (id, name) => {
  */
 const flatExists = async (name) => {
   return new Promise((resolve, reject) => {
-    Flat.findOne({ where: {name}}
+    Flat.findOne({ where: { name }}
     ).then(item => {
       if(item){
         reject(utils.buildErrObject(422, 'FLAT_ALREADY_EXISTS'))
@@ -104,8 +106,7 @@ exports.getItems = async (req, res) => {
 exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const id = await utils.isIDGood(req.id)
-    res.status(200).json(await db.getItem(id, Flat))
+    res.status(200).json(await db.getItem(req.id, Flat))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -119,9 +120,9 @@ exports.getItem = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const id = await utils.isIDGood(req.id)
-    const doesCityExists = await flatExistsExcludingItself(id, req.name)
-    if (!doesCityExists) {
+    const { id } = req
+    const doesFlatExists = await flatExistsExcludingItself(id, req.name)
+    if (!doesFlatExists) {
       res.status(200).json(await db.updateItem(id, Flat, req))
     }
   } catch (error) {
@@ -137,8 +138,8 @@ exports.updateItem = async (req, res) => {
 exports.createItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const doesCityExists = await flatExists(req.name)
-    if (!doesCityExists) {
+    const doesFlatExists = await flatExists(req.name)
+    if (!doesFlatExists) {
       res.status(201).json(await db.createItem(req, Flat))
     }
   } catch (error) {
@@ -154,8 +155,7 @@ exports.createItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const id = await utils.isIDGood(req.id)
-    res.status(200).json(await db.deleteItem(id, Flat))
+    res.status(200).json(await db.deleteItem(req.id, Flat))
   } catch (error) {
     utils.handleError(res, error)
   }
