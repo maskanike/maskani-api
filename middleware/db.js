@@ -36,7 +36,6 @@ const {
       const limit = parseInt(req.query.limit, 10) || 5
       const options = {
         sort: sortBy,
-        lean: true,
         page,
         limit
       }
@@ -92,8 +91,9 @@ const {
      */
     async getItems(req, model, query) {
       const options = await listInitOptions(req)
+      console.log(query, options)
       return new Promise((resolve, reject) => {
-          model.findAll(options).then(items => {
+          model.findAll({ where: query }, options).then(items => {
             resolve(cleanPaginationID(items))
           }).catch(err => {
             reject(buildErrObject(422, err.message))
