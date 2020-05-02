@@ -1,5 +1,5 @@
-const controller = require('../controllers/invoices')
-const validate = require('../controllers/invoices/validate')
+const controller = require('../controllers/units')
+const validate = require('../controllers/units/validate')
 const AuthController = require('../controllers/auth')
 const express = require('express')
 const router = express.Router()
@@ -11,14 +11,14 @@ const requireAuth = passport.authenticate('jwt', {
 const trimRequest = require('trim-request')
 
 /*
- * Invoices routes
+ * Units routes
  */
 
 /*
  * Get all items route
  */
 router.get(
-  '/all', 
+  '/all',
   requireAuth,
   AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,
@@ -40,12 +40,12 @@ router.get(
  * Create new item route
  */
 router.post(
-  '/:TenantId',
+  '/',
   requireAuth,
   AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,
-  validate.sendItem,
-  controller.sendItem
+  validate.createItem,
+  controller.createItem
 )
 
 /*

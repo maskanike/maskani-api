@@ -1,4 +1,4 @@
-const { Tenant, Sequelize } = require('../../models')
+const { Unit, Tenant, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const { getFlatBelongingToUser } = require('../utils')
 const utils = require('../../middleware/utils')
@@ -11,19 +11,18 @@ const Op = Sequelize.Op;
  *********************/
 
 /**
- * Checks if a tenant already exists excluding itself
- * @param {string} id - id of tenant
- * @param {string} email - email of tenant
- * @param {string} phone - mobile number of tenant
- * @param {number} FlatId - Id of flat the tenant belongs to
+ * Checks if a unit already exists excluding itself
+ * @param {string} id - id of unit
+ * @param {string} name - name of unit
+ * @param {number} FlatId - Id of flat the unit belongs to
  */
-const tenantExistsExcludingItself = async (id, email, phone, FlatId) => {
+const unitExistsExcludingItself = async (id, name, FlatId) => {
   return new Promise((resolve, reject) => {
-    Tenant.findOne(
-      { where: { email, phone, FlatId, id: { [Op.ne]: id }}
+    Unit.findOne(
+      { where: { name, FlatId, id: { [Op.ne]: id }}
     }).then(item => {
         if(item){
-          reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
+          reject(utils.buildErrObject(422, 'UNIT_ALREADY_EXISTS'))
         }
         resolve(false);
       })
@@ -34,16 +33,16 @@ const tenantExistsExcludingItself = async (id, email, phone, FlatId) => {
 }
 
 /**
- * Checks if a tenant already exists in database
- * @param {string} email - email of tenant
- * @param {string} phone - phone of tenant
+ * Checks if a unit already exists in database
+ * @param {string} name - name of unit
+ * @param {string} phone - phone of unit
  */
-const tenantExists = async (email, phone) => {
+const unitExists = async (name, phone) => {
   return new Promise((resolve, reject) => {
-    Tenant.findOne({ where: { email, phone }}
+    Unit.findOne({ where: { name, phone }}
     ).then(item => {
       if(item){
-        reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
+        reject(utils.buildErrObject(422, 'UNIT_ALREADY_EXISTS'))
       }
       resolve(false);
     })
@@ -55,16 +54,18 @@ const tenantExists = async (email, phone) => {
 
 /**
  * Gets all items from database
- * @param {number} FlatId - email of tenant
+ * @param {number} FlatId - Flat Id
  */
 const getAllItemsFromDB = async (FlatId) => {
   return new Promise((resolve, reject) => {
-    Tenant.findAll(
+    Unit.findAll(
       { 
         where: { FlatId },
+        include: [ Tenant ],
         exclude: ['updatedAt','createdAt'],
         order: [['name', 'DESC']]
       }).then(items => {
+        console.log(items);
         resolve(items);
       })
       .catch(err => {
@@ -84,7 +85,8 @@ const getAllItemsFromDB = async (FlatId) => {
  */
 exports.getAllItems = async (req, res) => {
   try {
-    res.status(200).json(await getAllItemsFromDB(req.user.FlatId))
+    const flat = await getFlatBelongingToUser(req.user.id);
+    res.status(200).json(await getAllItemsFromDB(flat.id))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -99,7 +101,7 @@ exports.getItems = async (req, res) => {
   try {
     const flat = await getFlatBelongingToUser(req.user.id);
     const query = await db.checkQueryString(req.query)
-    res.status(200).json(await db.getItems(req, Tenant, { ...query, FlatId:flat.id }))
+    res.status(200).json(await db.getItems(req, Unit, { ...query, FlatId:flat.id }))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -113,7 +115,7 @@ exports.getItems = async (req, res) => {
 exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
-    res.status(200).json(await db.getItem(req.id, Tenant))
+    res.status(200).json(await db.getItem(req.id, Unit))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -129,9 +131,9 @@ exports.updateItem = async (req, res) => {
     const flat = await getFlatBelongingToUser(req.user.id);
     req = matchedData(req)
     const { id } = req
-    const doesTenantExists = await tenantExistsExcludingItself(id, req.email, req.phone, flat.id)
-    if (!doesTenantExists) {
-      res.status(200).json(await db.updateItem(id, Tenant, req))
+    const doesUnitExists = await unitExistsExcludingItself(id, req.name, req.phone, flat.id)
+    if (!doesUnitExists) {
+      res.status(200).json(await db.updateItem(id, Unit, req))
     }
   } catch (error) {
     utils.handleError(res, error)
@@ -147,9 +149,9 @@ exports.createItem = async (req, res) => {
   try {
     const flat = await getFlatBelongingToUser(req.user.id);
     req = matchedData(req)
-    const doesTenantExists = await tenantExists(req.name, req.phone)
-    if (!doesTenantExists) {
-      res.status(201).json(await db.createItem({ ...req, FlatId: flat.id }, Tenant))
+    const doesUnitExists = await unitExists(req.name, req.phone)
+    if (!doesUnitExists) {
+      res.status(201).json(await db.createItem({ ...req, FlatId: flat.id }, Unit))
     }
   } catch (error) {
     utils.handleError(res, error)
@@ -164,7 +166,7 @@ exports.createItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   try {
     req = matchedData(req)
-    res.status(200).json(await db.deleteItem(req.id, Tenant))
+    res.status(200).json(await db.deleteItem(req.id, Unit))
   } catch (error) {
     utils.handleError(res, error)
   }

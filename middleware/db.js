@@ -91,7 +91,6 @@ const {
      */
     async getItems(req, model, query) {
       const options = await listInitOptions(req)
-      console.log(query, options)
       return new Promise((resolve, reject) => {
           model.findAll({ where: query }, options).then(items => {
             resolve(cleanPaginationID(items))

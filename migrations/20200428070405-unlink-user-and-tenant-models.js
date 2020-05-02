@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     const transaction = await queryInterface.sequelize.transaction();
@@ -9,10 +7,10 @@ module.exports = {
       await queryInterface.addColumn('Tenants', 'msisdn', { type: Sequelize.STRING }, { transaction });
       await queryInterface.removeColumn('Tenants', 'UserId', { transaction });
       await transaction.commit();
-  } catch (err) {
-    await transaction.rollback();
-    throw err;
-  }
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   },
 
   async down(queryInterface, Sequelize) {
@@ -23,9 +21,9 @@ module.exports = {
       await queryInterface.removeColumn('Tenants', 'msisdn', { transaction });
       await queryInterface.addColumn('Tenants', 'UserId', { type: Sequelize.INTEGER }, { transaction });
       await transaction.commit();
-  } catch (err) {
-    await transaction.rollback();
-    throw err;
-  }
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   },
 };

@@ -157,10 +157,9 @@ module.exports = {
   
   /**
    * Sends reset password email
-   * @param {string} locale - locale
    * @param {Object} user - user object
    */
-  async sendResetPasswordEmailMessage(locale, user) {
+  async sendResetPasswordEmailMessage(user) {
     const subject = "Password recovery at Maskani"
     const htmlMessage = `<p>To recover the password for user: ${user.name}</p> <p>click the following link:</p> <p>${process.env.FRONTEND_URL}/reset/${user.verification}</p> <p>If this was a mistake, you can ignore this message.</p> <p>Thank you.</p>`
     prepareToSendEmail(user, subject, htmlMessage)

@@ -4,14 +4,47 @@ const { check } = require('express-validator')
 /**
  * Validates create new item request
  */
-exports.createItem = [
-  check('name')
+exports.sendItem = [
+  check('rent')
     .exists()
     .withMessage('MISSING')
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY')
-    .trim(),
+    .isNumeric()
+    .withMessage('RENT_AMOUNT_IS_NOT_VALID'),
+  check('penalty')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('PENALTY_AMOUNT_IS_NOT_VALID'),
+  check('garbage')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('GARBAGE_AMOUNT_IS_NOT_VALID'),
+  check('water')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('WATER_AMOUNT_IS_NOT_VALID'),
+  check('UnitId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('UNIT_ID_IS_NOT_VALID'),
   (req, res, next) => {
     validationResult(req, res, next)
   }
@@ -21,12 +54,38 @@ exports.createItem = [
  * Validates update item request
  */
 exports.updateItem = [
-  check('name')
+  check('rent')
     .exists()
     .withMessage('MISSING')
     .not()
     .isEmpty()
-    .withMessage('IS_EMPTY'),
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('RENT_AMOUNT_IS_NOT_VALID'),
+  check('penalty')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('PENALTY_AMOUNT_IS_NOT_VALID'),
+  check('garbage')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('GARBAGE_AMOUNT_IS_NOT_VALID'),
+  check('water')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('WATER_AMOUNT_IS_NOT_VALID'),
   check('id')
     .exists()
     .withMessage('MISSING')

@@ -2,6 +2,8 @@ const { Flat, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
+const emailer = require('../../middleware/emailer')
+const smser = require('../../middleware/smser')
 
 const Op = Sequelize.Op;
 
@@ -14,7 +16,7 @@ const Op = Sequelize.Op;
  * @param {string} id - id of item
  * @param {string} name - name of item
  */
-const flatExistsExcludingItself = async (id, name) => {
+const invoiceExistsExcludingItself = async (id, name) => {
   return new Promise((resolve, reject) => {
     Invoice.findOne(
       { where: { name, id: { [Op.ne]: id }}
@@ -31,10 +33,10 @@ const flatExistsExcludingItself = async (id, name) => {
 }
 
 /**
- * Checks if a flat already exists in database
+ * Checks if a invoice already exists in database
  * @param {string} name - name of item
  */
-const flatExists = async (name) => {
+const invoiceExists = async (name) => {
   return new Promise((resolve, reject) => {
     Flat.findOne({ where: { name }}
     ).then(item => {
@@ -122,7 +124,7 @@ exports.updateItem = async (req, res) => {
   try {
     req = matchedData(req)
     const { id } = req
-    const doesFlatExists = await flatExistsExcludingItself(id, req.name)
+    const doesFlatExists = await invoiceExistsExcludingItself(id, req.name)
     if (!doesFlatExists) {
       res.status(200).json(await db.updateItem(id, Flat, req))
     }
@@ -136,13 +138,15 @@ exports.updateItem = async (req, res) => {
  * @param {Object} req - request object
  * @param {Object} res - response object
  */
-exports.createItem = async (req, res) => {
+exports.sendItem = async (req, res) => {
   try {
+    const user = req.user;
     req = matchedData(req)
-    const doesFlatExists = await flatExists(req.name)
-    if (!doesFlatExists) {
-      res.status(201).json(await db.createItem(req, Flat))
-    }
+    const invoice = await db.createItem(req, Invoice)
+    emailer.sendInvoiceEmail(user, invoice)
+    smser.sendInvoiceSMS(user, invoice)
+    res.status(201).json(invoice)
+    
   } catch (error) {
     utils.handleError(res, error)
   }
