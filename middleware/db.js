@@ -87,6 +87,7 @@ const {
     /**
      * Gets items from database
      * @param {Object} req - request object
+     * @param {Object} model - model object
      * @param {Object} query - query object
      */
     async getItems(req, model, query) {

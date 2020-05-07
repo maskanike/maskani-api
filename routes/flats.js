@@ -49,6 +49,17 @@ router.post(
 )
 
 /*
+ * Get flat by UserId route
+ */
+router.get(
+  '/user',
+  requireAuth,
+  AuthController.roleAuthorization(['user','admin']),
+  trimRequest.all,
+  controller.getItemByUserId
+)
+
+/*
  * Get item route
  */
 router.get(

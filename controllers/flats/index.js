@@ -9,6 +9,29 @@ const Op = Sequelize.Op;
  * Private functions *
  *********************/
 
+
+/**
+ * Gets profile from database by id
+ * @param {string} id - user id
+ */
+const getFlatFromUserId = async (id) => {
+  return new Promise((resolve, reject) => {
+    Flat.findAll({ where: { UserId: id }})
+      .then(flat => {
+        if (!flat) {
+          reject(utils.buildErrObject(422, 'NOT_FOUND'))
+        }
+        if (flat.length > 1) {
+          reject(utils.buildErrObject(422, 'MORE_THAN_ONE_FLAT_FOUND'))
+        }
+        resolve(flat[0])
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message))
+      })
+  })
+}
+
 /**
  * Checks if a flat already exists excluding itself
  * @param {string} id - id of item
@@ -107,6 +130,19 @@ exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
     res.status(200).json(await db.getItem(req.id, Flat))
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Get item function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.getItemByUserId = async (req, res) => {
+  try {
+    res.status(200).json(await getFlatFromUserId(req.user.id))
   } catch (error) {
     utils.handleError(res, error)
   }
