@@ -59,6 +59,12 @@ exports.createItem = [
     .withMessage('IS_EMPTY')
     .isNumeric()
     .withMessage('WATER_AMOUNT_IS_NOT_VALID'),
+  check('UnitId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
   (req, res, next) => {
     validationResult(req, res, next)
   }
@@ -127,6 +133,12 @@ exports.updateItem = [
     .withMessage('IS_EMPTY')
     .isNumeric()
     .withMessage('WATER_AMOUNT_IS_NOT_VALID'),
+  check('UnitId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
   (req, res, next) => {
     validationResult(req, res, next)
   }

@@ -65,7 +65,6 @@ const getAllItemsFromDB = async (FlatId) => {
         exclude: ['updatedAt','createdAt'],
         order: [['name', 'DESC']]
       }).then(items => {
-        console.log(items);
         resolve(items);
       })
       .catch(err => {

@@ -131,6 +131,7 @@ const {
     /**
      * Updates an item in database by id
      * @param {string} id - item id
+     * @param {string} model - model to update
      * @param {Object} req - request object
      */
     async updateItem(id, model, req) {

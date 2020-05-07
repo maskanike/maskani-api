@@ -1,4 +1,4 @@
-const { Tenant, Sequelize } = require('../../models')
+const { Tenant, Unit, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const { getFlatBelongingToUser } = require('../utils')
 const utils = require('../../middleware/utils')
@@ -46,6 +46,27 @@ const tenantExists = async (email, phone) => {
         reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
       }
       resolve(false);
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message));
+    });
+  })
+}
+
+/**
+ * Assign a unit to a tenant
+ * @param {number} TenantId - id of tenant
+ * @param {number} unitId - id of unit
+ */
+const assignTenantToUnit = async (TenantId, unitId) => {
+  return new Promise((resolve, reject) => {
+    Unit.findOne({ where: { id: unitId }}
+    ).then(async(item) => {
+      if(!item){
+        reject(utils.buildErrObject(422, 'UNIT_NOT_FOUND'))
+      }
+      const unit = await db.updateItem(item.id, Unit, { TenantId })
+      resolve(unit);
     })
     .catch(err => {
       reject(utils.buildErrObject(422, err.message));
@@ -149,7 +170,9 @@ exports.createItem = async (req, res) => {
     req = matchedData(req)
     const doesTenantExists = await tenantExists(req.name, req.phone)
     if (!doesTenantExists) {
-      res.status(201).json(await db.createItem({ ...req, FlatId: flat.id }, Tenant))
+      const tenant = await db.createItem({ ...req, FlatId: flat.id }, Tenant)
+      const updatedTenant = await assignTenantToUnit(tenant.id, req.UnitId, flat.id)
+      res.status(201).json(updatedTenant);
     }
   } catch (error) {
     utils.handleError(res, error)
