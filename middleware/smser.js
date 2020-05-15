@@ -147,7 +147,7 @@ module.exports = {
    * @param {Object} user - user object
    * @param {Object} invoice - invoice object
    */
-  async sendInvoiceSms(user, invoice) {
+  async sendInvoiceSMS(user, invoice) {
     const message = `Hey ${user.name}, Your Invoice is ready. Rent: ${invoice.rent}`
     prepareToSendSMS(user, message)
   }

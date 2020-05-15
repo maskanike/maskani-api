@@ -1,4 +1,4 @@
-const { Flat, Sequelize } = require('../../models')
+const { Flat, Invoice, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')

@@ -184,6 +184,23 @@ exports.createItem = async (req, res) => {
 }
 
 /**
+ * Create item function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.createUserItem = async (req, res) => {
+  try {
+    req = matchedData(req)
+    const doesFlatExists = await flatExists(req.name)
+    if (!doesFlatExists) {
+      res.status(201).json(await db.createItem(req, Flat))
+    }
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
  * Delete item function called by route
  * @param {Object} req - request object
  * @param {Object} res - response object

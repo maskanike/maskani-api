@@ -145,7 +145,7 @@ module.exports = {
     })
   },
 
-    /**
+  /**
    * Sends registration email
    * @param {Object} user - user object
    */
@@ -163,5 +163,15 @@ module.exports = {
     const subject = "Password recovery at Maskani"
     const htmlMessage = `<p>To recover the password for user: ${user.name}</p> <p>click the following link:</p> <p>${process.env.FRONTEND_URL}/reset/${user.verification}</p> <p>If this was a mistake, you can ignore this message.</p> <p>Thank you.</p>`
     prepareToSendEmail(user, subject, htmlMessage)
-  }
+  },
+
+  /**
+   * Sends invoice email
+   * @param {Object} user - user object
+   */
+  async sendInvoiceEmail(user) {
+    const subject = "Your Invoice for This Month"
+    const htmlMessage = `<p>Hello ${user.name}.</p> <p>Welcome! Your invoice for this month is 2000 Shs.</p> <p>Thank you.</p>`
+    prepareToSendEmail(user, subject, htmlMessage)
+  },
 }
