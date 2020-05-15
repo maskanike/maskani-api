@@ -45,6 +45,14 @@ exports.sendItem = [
     .withMessage('IS_EMPTY')
     .isNumeric()
     .withMessage('UNIT_ID_IS_NOT_VALID'),
+  check('TenantId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isNumeric()
+    .withMessage('TENANT_ID_IS_NOT_VALID'),
   (req, res, next) => {
     validationResult(req, res, next)
   }
