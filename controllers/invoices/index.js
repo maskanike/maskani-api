@@ -1,4 +1,4 @@
-const { Flat, Invoice, Sequelize } = require('../../models')
+const { Flat, Invoice, Tenant, Sequelize } = require('../../models')
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
@@ -63,6 +63,25 @@ const getAllItemsFromDB = async (flatId) => {
         order: [['name', 'DESC']]
       }).then(items => {
         resolve(items);
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message));
+      });
+  })
+}
+
+/**
+ * Update tenant lastInvoiceSentAt timestamp
+ * @param {number} id - Tenant Id
+ */
+const updateTenantInvoiceSentAt = async(id) => {
+  return new Promise((resolve, reject) => {
+    const lastInvoiceSentAt = new Date();
+    Tenant.update(
+      { lastInvoiceSentAt },
+      { where: { id },
+      }).then(() => {
+        resolve(true);
       })
       .catch(err => {
         reject(utils.buildErrObject(422, err.message));
@@ -143,6 +162,7 @@ exports.sendItem = async (req, res) => {
     const user = req.user;
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
+    await updateTenantInvoiceSentAt(req.TenantId);
     emailer.sendInvoiceEmail(user, invoice)
     smser.sendInvoiceSMS(user, invoice)
     res.status(201).json(invoice)

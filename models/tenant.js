@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
     penalty: DataTypes.INTEGER,
     receiptAmount: DataTypes.INTEGER,
     status: DataTypes.ENUM('unchanged', 'changed', 'left'),
+    lastInvoiceSentAt: DataTypes.DATE,
+    lastReceiptSentAt: DataTypes.DATE,
   }, {});
   Tenant.associate = (models) => {
     Tenant.belongsTo(models.Flat);
