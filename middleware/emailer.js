@@ -20,7 +20,7 @@ const logEmail = async(data) => {
 const logFailedEmailSending = async(data, err) => {
   const failedEmail = {
     message: data.htmlMessage,
-    destination: data.to,
+    destination: data.to.email,
     type: 'email',
     error: err,
     status: 'failed',
@@ -35,7 +35,7 @@ const logFailedEmailSending = async(data, err) => {
 const logSuccessfulEmailSending = async(data) => {
   const successEmail = {
     message: data.htmlMessage,
-    destination: data.to,
+    destination: data.to.email,
     type: 'email',
     status: 'success',
   }
@@ -53,8 +53,8 @@ const sendEmail = async (data, callback) => {
     domain: process.env.EMAIL_SMTP_DOMAIN_MAILGUN
   });
   const email = {
-    from: `${data.name} <${from}>`,
-    to: `${data.user.name} <${data.user.email}>`,
+    from: `${data.from.name} <${data.from.email}>`,
+    to: `${data.to.name} <${data.to.email}>`,
     subject: data.subject,
     html: data.htmlMessage,
   };
@@ -67,12 +67,6 @@ const sendEmail = async (data, callback) => {
     logSuccessfulEmailSending(data);
     return callback(true)
   });
-  transporter.sendMail(mailOptions, (err) => {
-    if (err) {
-      return callback(false)
-    }
-    return callback(true)
-  })
 }
 
 /**
@@ -82,21 +76,60 @@ const sendEmail = async (data, callback) => {
  * @param {string} htmlMessage - html message
  */
 const prepareToSendEmail = (user, subject, htmlMessage) => {
-  user = {
+  from = {
+    name: 'Maskani Team',
+    email: 'info@maskani.co.ke'
+  }
+
+  to = {
     name: user.name,
     email: user.email,
     verification: user.verification
   }
   const data = {
-    user,
+    from,
+    to,
     subject,
     htmlMessage
   }
   if (process.env.NODE_ENV === 'production') {
     sendEmail(data, (messageSent) =>
       messageSent
-        ? console.log(`Email SENT to: ${user.email}`)
-        : console.log(`Email FAILED to: ${user.email}`)
+        ? console.log(`Email SENT to: ${to.email}`)
+        : console.log(`Email FAILED to: ${to.email}`)
+    )
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log(data)
+  }
+}
+
+/**
+ * Prepares to send email
+ * @param {string} user - user object
+ * @param {string} tenant - tenant object
+ * @param {string} subject - subject
+ * @param {string} htmlMessage - html message
+ */
+const prepareToSendTenantEmail = (user, tenant, subject, htmlMessage) => {
+  from = {
+    name: user.name,
+    email: user.email,
+  }
+  to = {
+    name: tenant.name,
+    email: tenant.email
+  }
+  const data = {
+    from,
+    to,
+    subject,
+    htmlMessage
+  }
+  if (process.env.NODE_ENV === 'production') {
+    sendEmail(data, (messageSent) =>
+      messageSent
+        ? console.log(`Email SENT to: ${to.email}`)
+        : console.log(`Email FAILED to: ${to.email}`)
     )
   } else if (process.env.NODE_ENV === 'development') {
     console.log(data)
@@ -168,10 +201,12 @@ module.exports = {
   /**
    * Sends invoice email
    * @param {Object} user - user object
+   * @param {Object} tenant - tenant object
+   * @param {Object} invoice - invoice object
    */
-  async sendInvoiceEmail(user) {
+  async sendInvoiceEmail(user, tenant, invoice) {
     const subject = "Your Invoice for This Month"
-    const htmlMessage = `<p>Hello ${user.name}.</p> <p>Welcome! Your invoice for this month is 2000 Shs.</p> <p>Thank you.</p>`
-    prepareToSendEmail(user, subject, htmlMessage)
+    const htmlMessage = `<p>Hello ${tenant.name}.</p> <p>Welcome! Your invoice for this month is ${invoice.rent} Shs.</p> <p>Thank you.</p>`
+    prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
   },
 }

@@ -79,9 +79,9 @@ const updateTenantInvoiceSentAt = async(id) => {
     const lastInvoiceSentAt = new Date();
     Tenant.update(
       { lastInvoiceSentAt },
-      { where: { id },
-      }).then(() => {
-        resolve(true);
+      { where: { id }, returning: true, plain: true
+      }).then((result) => {
+        resolve(result[1].dataValues);
       })
       .catch(err => {
         reject(utils.buildErrObject(422, err.message));
@@ -162,8 +162,8 @@ exports.sendItem = async (req, res) => {
     const user = req.user;
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
-    await updateTenantInvoiceSentAt(req.TenantId);
-    emailer.sendInvoiceEmail(user, invoice)
+    const tenant = await updateTenantInvoiceSentAt(req.TenantId);
+    emailer.sendInvoiceEmail(user, tenant, invoice)
     smser.sendInvoiceSMS(user, invoice)
     res.status(201).json(invoice)
     
