@@ -53,6 +53,12 @@ exports.sendItem = [
     .withMessage('IS_EMPTY')
     .isNumeric()
     .withMessage('TENANT_ID_IS_NOT_VALID'),
+  check('dueDate')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
   (req, res, next) => {
     validationResult(req, res, next)
   }

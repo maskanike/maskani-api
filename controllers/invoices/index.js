@@ -71,15 +71,18 @@ const getAllItemsFromDB = async (flatId) => {
 }
 
 /**
- * Update tenant lastInvoiceSentAt timestamp
- * @param {number} id - Tenant Id
+ * Update tenant object
+ * @param {object} req - request object
  */
-const updateTenantInvoiceSentAt = async(id) => {
+const updateTenantObject = async(req) => {
   return new Promise((resolve, reject) => {
     const lastInvoiceSentAt = new Date();
     Tenant.update(
-      { lastInvoiceSentAt },
-      { where: { id }, returning: true, plain: true
+      { 
+        lastInvoiceSentAt, rent: req.rent, water: req.water,
+        garbage: req.garbage, penalty: req.penalty
+       },
+      { where: { id: req.TenantId }, returning: true, plain: true
       }).then((result) => {
         resolve(result[1].dataValues);
       })
@@ -162,7 +165,7 @@ exports.sendItem = async (req, res) => {
     const user = req.user;
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
-    const tenant = await updateTenantInvoiceSentAt(req.TenantId);
+    const tenant = await updateTenantObject(req);
     emailer.sendInvoiceEmail(user, tenant, invoice)
     smser.sendInvoiceSMS(user, invoice)
     res.status(201).json(invoice)
