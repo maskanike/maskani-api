@@ -35,11 +35,10 @@ const unitExistsExcludingItself = async (id, name, FlatId) => {
 /**
  * Checks if a unit already exists in database
  * @param {string} name - name of unit
- * @param {string} phone - phone of unit
  */
-const unitExists = async (name, phone) => {
+const unitExists = async (name) => {
   return new Promise((resolve, reject) => {
-    Unit.findOne({ where: { name, phone }}
+    Unit.findOne({ where: { name }}
     ).then(item => {
       if(item){
         reject(utils.buildErrObject(422, 'UNIT_ALREADY_EXISTS'))
@@ -70,6 +69,24 @@ const getAllItemsFromDB = async (FlatId) => {
       .catch(err => {
         reject(utils.buildErrObject(422, err.message));
       });
+  })
+}
+
+/**
+ * Create a new unit
+ * @param {string} name - unit name
+ * @param {number} FlatId - Flat Id
+ * @param {number} TenantId - Tenant Id, can be null.
+ */
+const createUnit = async(name, FlatId, TenantId=null) => {
+  return new Promise((resolve, reject) => {
+    db.createItem({ name, FlatId, TenantId }, Unit)
+    .then(items => {
+      resolve(items);
+    })
+    .catch(err => {
+      reject(utils.buildErrObject(422, err.message));
+    })
   })
 }
 
@@ -140,7 +157,27 @@ exports.updateItem = async (req, res) => {
 }
 
 /**
- * Create item function called by route
+ * Create unit with tenant function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.createUnitWithTenant = async (req, res) => {
+  try {
+    const flat = await getFlatBelongingToUser(req.user.id);
+    req = matchedData(req)
+    const doesUnitExists = await unitExists(req.unitName)
+    if (!doesUnitExists) {
+      const tenant = await db.createItem({ ...req, FlatId: flat.id }, Tenant)
+      const unit = await createUnit(req.unitName, flat.id, tenant.id);
+      res.status(201).json(unit)
+    }
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Create unit function called by route
  * @param {Object} req - request object
  * @param {Object} res - response object
  */
@@ -148,9 +185,9 @@ exports.createItem = async (req, res) => {
   try {
     const flat = await getFlatBelongingToUser(req.user.id);
     req = matchedData(req)
-    const doesUnitExists = await unitExists(req.name, req.phone)
+    const doesUnitExists = await unitExists(req.name)
     if (!doesUnitExists) {
-      res.status(201).json(await db.createItem({ ...req, FlatId: flat.id }, Unit))
+      res.status(201).json(await createUnit(req.name, flat.id))
     }
   } catch (error) {
     utils.handleError(res, error)

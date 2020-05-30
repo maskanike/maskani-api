@@ -15,7 +15,7 @@ const trimRequest = require('trim-request')
  */
 
 /*
- * Get all items route
+ * Get all units route
  */
 router.get(
   '/all',
@@ -26,7 +26,7 @@ router.get(
 )
 
 /*
- * Get items route
+ * Get units route
  */
 router.get(
   '/',
@@ -37,7 +37,7 @@ router.get(
 )
 
 /*
- * Create new item route
+ * Create new unit route
  */
 router.post(
   '/',
@@ -49,7 +49,19 @@ router.post(
 )
 
 /*
- * Get item route
+ * Create new unit with a tenant route
+ */
+router.post(
+  '/tenant/',
+  requireAuth,
+  AuthController.roleAuthorization(['user', 'admin']),
+  trimRequest.all,
+  validate.createUnitWithTenant,
+  controller.createUnitWithTenant
+)
+
+/*
+ * Get unit route
  */
 router.get(
   '/:id',
@@ -61,7 +73,7 @@ router.get(
 )
 
 /*
- * Update item route
+ * Update unit route
  */
 router.patch(
   '/:id',
@@ -73,7 +85,7 @@ router.patch(
 )
 
 /*
- * Delete item route
+ * Delete unit route
  */
 router.delete(
   '/:id',

@@ -26,7 +26,8 @@ exports.createItem = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isEmail()
-    .withMessage('EMAIL_IS_NOT_VALID'),
+    .withMessage('EMAIL_IS_NOT_VALID')
+    .trim(),
   check('rent')
     .exists()
     .withMessage('MISSING')
@@ -34,7 +35,8 @@ exports.createItem = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isNumeric()
-    .withMessage('RENT_AMOUNT_IS_NOT_VALID'),
+    .withMessage('RENT_AMOUNT_IS_NOT_VALID')
+    .trim(),
   check('penalty')
     .exists()
     .withMessage('MISSING')
@@ -42,7 +44,8 @@ exports.createItem = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isNumeric()
-    .withMessage('PENALTY_AMOUNT_IS_NOT_VALID'),
+    .withMessage('PENALTY_AMOUNT_IS_NOT_VALID')
+    .trim(),
   check('garbage')
     .exists()
     .withMessage('MISSING')
@@ -50,7 +53,8 @@ exports.createItem = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isNumeric()
-    .withMessage('GARBAGE_AMOUNT_IS_NOT_VALID'),
+    .withMessage('GARBAGE_AMOUNT_IS_NOT_VALID')
+    .trim(),
   check('water')
     .exists()
     .withMessage('MISSING')
@@ -58,7 +62,8 @@ exports.createItem = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isNumeric()
-    .withMessage('WATER_AMOUNT_IS_NOT_VALID'),
+    .withMessage('WATER_AMOUNT_IS_NOT_VALID')
+    .trim(),
   check('UnitId')
     .exists()
     .withMessage('MISSING')
