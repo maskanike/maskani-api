@@ -18,7 +18,7 @@ deploy_secrets() {
 	fi
 }
 
-app=maskani
+app=maskani-api
 ip=$2
 password=$3
 case $1 in
