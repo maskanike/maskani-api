@@ -1,0 +1,21 @@
+## DO NOT apply to cluster manually. Added here for logging
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: maskani-tls
+  namespace: default
+spec:
+  secretName: maskani-tls
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: www.maskani.co.ke
+  dnsNames:
+  - www.maskani.co.ke
+  acme:
+    config:
+    - http01:
+        ingress: maskani
+      domains:
+      - www.maskani.co.ke
