@@ -1,9 +1,12 @@
 const { Flat, Invoice, Tenant, Sequelize } = require('../../models')
+
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
+const { getFlat, getUnitByTenantId } = require('../utils')
+const { getMonth, getYear } = require('date-fns')
 
 const Op = Sequelize.Op;
 
@@ -91,6 +94,12 @@ const updateTenantObject = async(req) => {
       });
   })
 }
+/**
+ * @param {object} invoice - invoice object
+ */
+const calculateTotalRent = (invoice) => {
+  return (invoice.rent + invoice.penalty + invoice.water + invoice.garbage);
+}
 
 /********************
  * Public functions *
@@ -166,8 +175,19 @@ exports.sendItem = async (req, res) => {
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
     const tenant = await updateTenantObject(req);
-    emailer.sendInvoiceEmail(user, tenant, invoice)
-    smser.sendInvoiceSMS(user, invoice)
+    const flat = await getFlat(tenant.FlatId) // TODO the flat name can be stored as metadata on the tenant model to speed queries
+    const unit = await getUnitByTenantId(tenant.id) // TODO the unit name can be stored as metadata too
+
+    const totalRentAmount = calculateTotalRent(invoice);
+    const notificationMetaData = {
+      month: getMonth(invoice.dueDate),
+      year: getYear(invoice.dueDate),
+      totalRentAmount,
+      flat: flat.name,
+      unit: unit.name,
+    }
+    emailer.sendInvoiceEmail(user, tenant, invoice, notificationMetaData)
+    smser.sendInvoiceSMS(user, notificationMetaData)
     res.status(201).json(invoice)
     
   } catch (error) {
@@ -183,7 +203,7 @@ exports.sendItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
   try {
     req = matchedData(req)
-    res.status(200).json(await db.deleteItem(req.id, Flat))
+    res.status(200).json(await db.deleteItem(req.id, Invoice))
   } catch (error) {
     utils.handleError(res, error)
   }

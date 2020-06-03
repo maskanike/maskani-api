@@ -137,11 +137,14 @@ module.exports = {
   
   /**
    * Sends reset password sms
-   * @param {Object} user - user object
-   * @param {Object} invoice - invoice object
+   * @param {object} user - user object
+   * @param {object} notificationMetaData -  notification meta data
    */
-  async sendInvoiceSMS(user, invoice) {
-    const message = `Hey ${user.name}, Your Invoice is ready. Rent: ${invoice.rent}`
+  async sendInvoiceSMS(user, notificationMetaData) {
+    const message = 
+      `Hello ${user.name.split(' ')[0]}! This is an invoice for ${notificationMetaData.unit} `
+      + `at ${notificationMetaData.flat} for the period ${notificationMetaData.month} - ${notificationMetaData.year}.\n`
+      + `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${user.email}.`;
     prepareToSendSMS(user, message)
   }
 }

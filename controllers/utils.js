@@ -1,11 +1,11 @@
-const { Flat } = require('../models')
+const { Flat, Unit } = require('../models')
 const utils = require('../middleware/utils')
 
 
 module.exports = {
 /**
  * Gets flat belonging to user
- * @param {number} FlatId - email of tenant
+ * @param {number} UserId - Id of user
  */
 async getFlatBelongingToUser(UserId) {
     return new Promise((resolve, reject) => {
@@ -24,5 +24,49 @@ async getFlatBelongingToUser(UserId) {
           reject(utils.buildErrObject(422, err.message));
         });
     })
+  },
+
+  /**
+   * Gets flat by flatId
+   * @param {number} id - Id of flat
+   */
+  async getFlat(id) {
+    return new Promise((resolve, reject) => {
+      Flat.findOne(
+        { 
+          where: { id },
+          exclude: ['updatedAt','createdAt'],
+        }).then(flat => {
+          if(!flat) {
+            reject(utils.buildErrObject(422, 'FLAT_NOT_FOUND_FOR_USER'))
+          }
+          resolve(flat);
+        })
+        .catch(err => {
+          reject(utils.buildErrObject(422, err.message));
+        });
+    })
+  },
+
+  /**
+   * Gets unit by tenantId
+   * @param {number} TenantId - Id of tenant
+   */
+  async getUnitByTenantId(TenantId) {
+    return new Promise((resolve, reject) => {
+      Unit.findOne(
+        { 
+          where: { TenantId },
+          exclude: ['updatedAt','createdAt'],
+        }).then(flat => {
+          if(!flat) {
+            reject(utils.buildErrObject(422, 'FLAT_NOT_FOUND_FOR_USER'))
+          }
+          resolve(flat);
+        })
+        .catch(err => {
+          reject(utils.buildErrObject(422, err.message));
+        });
+    })
   }
- }
+}

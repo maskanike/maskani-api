@@ -4,8 +4,22 @@ const Mailgun = require('mailgun-js');
 
 const Op = Sequelize.Op;
 
+const EMAIL_HEADER = '<div style="background-color: #FAFAFA; width: 100%; font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif; box-sizing: border-box; padding-bottom: 25px; margin: 0;">'
++ '<div style="background: transparent; padding-top: 30px; padding-bottom: 20px; text-align: center;">'
++ '<img style="display: inline-block; height: 30px; width: auto; margin-left: auto; margin-right: auto;" alt="Logo" src="https://maskani.co.ke/assets/img/maskani_logo.png"/>'
++ '</div><div style="background-color: #fff; color: #000; font-size: 1em; border-top: 2px solid #00ACC4; border-bottom: 1px solid #E6E6E6; box-sizing: border-box; padding: 25px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">';
+
+const EMAIL_FOOTER = '</div>'
++ '<div style="text-align: center; padding-top: 15px; margin-bottom: 15px; font-size: 12px;">'
++ '  <a style="color: #00ACC4;" href="/contact">Help</a>'
++ '  <span style="color: #ccc;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>'
++ '  <a style="color: #00ACC4;" href="/terms-of-service">Terms of Service</a>'
++ '  <span style="color: #ccc;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>'
++ '  <a style="color: #00ACC4;" href="/privacy-policy">Privacy Policy</a>'
++ '</div>';
+
 /**
- * 
+ * Log email in database
  * @param {Object} data 
  */
 const logEmail = async(data) => {
@@ -13,7 +27,7 @@ const logEmail = async(data) => {
 }
 
 /**
- * 
+ * Log failed email sending
  * @param {Object} data 
  * @param {Object} error 
  */
@@ -200,13 +214,30 @@ module.exports = {
 
   /**
    * Sends invoice email
-   * @param {Object} user - user object
-   * @param {Object} tenant - tenant object
-   * @param {Object} invoice - invoice object
+   * @param {object} user - user object
+   * @param {object} tenant - tenant object
+   * @param {object} invoice - invoice object
+   * @param {object} notificationMetaData - metadata used to send notification
    */
-  async sendInvoiceEmail(user, tenant, invoice) {
-    const subject = "Your Invoice for This Month"
-    const htmlMessage = `<p>Hello ${tenant.name}.</p> <p>Welcome! Your invoice for this month is ${invoice.rent} Shs.</p> <p>Thank you.</p>`
+  async sendInvoiceEmail(user, tenant, invoice, notificationMetaData) {
+    const subject = `Your Invoice for ${notificationMetaData.month} - ${notificationMetaData.year} | ${notificationMetaData.flat}`;
+
+    const htmlMessage = `${EMAIL_HEADER
+    }<p style="margin-bottom: 25px;">Dear ${user.name},</p>`
+      + `<p style="margin-bottom: 25px;">Thank you for being a tenant at <b> ${notificationMetaData.flat} </b> unit  <b> ${notificationMetaData.unit}</b>. `
+      + `Your invoice for ${notificationMetaData.month} ${notificationMetaData.year} is ready.</p>`
+      + `<p style="margin-bottom: 25px;">Please pay <b> ${notificationMetaData.totalRentAmount} KSHS</b> before ${invoice.dueDate} .</p> `
+      + '<p style="margin-bottom: 25px;">Your rental breakdown is as follows:</p>'
+      + '<ul class="list-group list-group-flush"></ul>'
+      + `<li class="list-group-item">Rent Due: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.rent} </a></li>`
+      + `<li class="list-group-item">Water Bill: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.water} </a></li>`
+      + `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage} </a></li>`
+      + `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty} </a></li>`
+      + '</ul>'
+      + '<br>'
+      + '<p style="margin-top: 10px;">Sincerely,</p> '
+      + `<p style="margin-top: 2px;">The Maskani Team</p>${
+        EMAIL_FOOTER}`;
     prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
   },
 }
