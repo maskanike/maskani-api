@@ -180,7 +180,7 @@ exports.sendItem = async (req, res) => {
 
     const totalRentAmount = calculateTotalRent(invoice);
     const notificationMetaData = {
-      month: getMonth(invoice.dueDate),
+      month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
       year: getYear(invoice.dueDate),
       totalRentAmount,
       flat: flat.name,
