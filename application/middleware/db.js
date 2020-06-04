@@ -36,7 +36,6 @@ const {
       const limit = parseInt(req.query.limit, 10) || 5
       const options = {
         sort: sortBy,
-        lean: true,
         page,
         limit
       }
@@ -88,12 +87,13 @@ const {
     /**
      * Gets items from database
      * @param {Object} req - request object
+     * @param {Object} model - model object
      * @param {Object} query - query object
      */
     async getItems(req, model, query) {
       const options = await listInitOptions(req)
       return new Promise((resolve, reject) => {
-          model.findAll(options).then(items => {
+          model.findAll({ where: query }, options).then(items => {
             resolve(cleanPaginationID(items))
           }).catch(err => {
             reject(buildErrObject(422, err.message))
@@ -132,6 +132,7 @@ const {
     /**
      * Updates an item in database by id
      * @param {string} id - item id
+     * @param {string} model - model to update
      * @param {Object} req - request object
      */
     async updateItem(id, model, req) {

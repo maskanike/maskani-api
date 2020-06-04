@@ -10,7 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     garbage: DataTypes.INTEGER,
     penalty: DataTypes.INTEGER,
     receiptAmount: DataTypes.INTEGER,
-    status: DataTypes.ENUM('unchanged', 'changed', 'left'),
+    status: DataTypes.ENUM('unchanged', 'changed', 'left'), // occupancy status
+    paymentStatus: DataTypes.ENUM('fully_paid', 'has_dues', 'defaulted'), // payment status
+    lastPaymentMadeAt: DataTypes.DATE,
+    lastInvoiceSentAt: DataTypes.DATE,
+    lastReceiptSentAt: DataTypes.DATE,
   }, {});
   Tenant.associate = (models) => {
     Tenant.belongsTo(models.Flat);

@@ -1,0 +1,89 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: google/cloud-sdk:latest
+      - image: postgres:9.6.10-alpine
+        ports:
+          - "5432:5432"
+        environment:
+          - POSTGRES_DB: saal_db
+          - POSTGRES_USER: test
+          - POSTGRES_PASSWORD: test
+    environment:
+      - APP_NAME: maskani-api
+      - APP_VERSION: 1.0.0
+      - REPLICAS: 3
+      - PROJECT_NAME: flatspad
+      - CLUSTER_NAME: flatspad-k8s-large
+      - CLUSTER_ZONE: europe-west1-d
+      - TEST_DB_NAME: saal_db
+      - DB_NAME: saal_db
+      - DB_USERNAME: test
+      - DB_PASSWORD: test
+      - TERM: xterm
+    working_directory: ~/app
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 17.11.0-ce
+      - run:
+          name: Setup Namespace
+          command: |
+            echo 'export IMAGE_TAG=gcr.io/${PROJECT_NAME}/${APP_NAME}:${CIRCLE_BRANCH/\//-}.${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+            if [ "${CIRCLE_BRANCH}" == "dev" ]; then
+              echo 'export NAMESPACE=staging' >> $BASH_ENV
+            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo 'export NAMESPACE=production' >> $BASH_ENV
+              sed -i.bak "s#replicas: 1#replicas: ${REPLICAS}#" kubernetes/deployments/deployment.yaml
+            elif [[ -f .deploy-to-sandbox ]]; then
+              echo 'export NAMESPACE=sandbox' >> $BASH_ENV
+            fi
+      - run:
+          name: Install node
+          command: |
+            curl -sL https://deb.nodesource.com/setup_10.x | bash -
+            apt-get install -y nodejs
+      - run:
+          name: Install yarn
+          command: |
+           curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+           echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+           apt-get update
+           apt-get install --no-install-recommends yarn
+      - run: 
+          name: Run Tests
+          command: |
+            cd application && yarn install && yarn test
+      - run:
+          name: Build Image
+          command: |
+            gcloud debug source gen-repo-info-file --output-directory=./application
+            docker build . -t ${IMAGE_TAG}
+      - run:
+          name: Push Image to Registry
+          command: |
+            if [ ${NAMESPACE} == "staging" ] || [ "${NAMESPACE}" == "production" ] || [ "${NAMESPACE}" == "sandbox" ]; then
+              echo ${GCLOUD_SERVICE_KEY} | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+              gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+              gcloud --quiet config set project ${PROJECT_NAME}
+              gcloud docker -- push ${IMAGE_TAG}
+            fi
+      - deploy:
+          name: Deploy Application
+          command: |
+            if [ "${NAMESPACE}" == "staging" ] || [ "${NAMESPACE}" == "production" ] || [ "${NAMESPACE}" == "sandbox" ]; then
+              sed -i.bak "s#gcr.io/${PROJECT_NAME}/${APP_NAME}:${APP_VERSION}#${IMAGE_TAG}#" kubernetes/deployments/deployment.yaml
+              gcloud --quiet container clusters get-credentials ${CLUSTER_NAME} --zone ${CLUSTER_ZONE} --project ${PROJECT_NAME}
+              kubectl apply --namespace=${NAMESPACE} -f kubernetes/services/services.yaml
+              kubectl apply --namespace=${NAMESPACE} -f kubernetes/deployments/deployment.yaml
+              kubectl apply --namespace=${NAMESPACE} -f kubernetes/ingress/${NAMESPACE}.yaml
+              echo "Deploy to ${NAMESPACE} was successful"
+            else
+              echo "unknown env. No deploy happened."
+            fi      
+workflows:
+  version: 2
+  build-n-deloy:
+    jobs:
+      - build

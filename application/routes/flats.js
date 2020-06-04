@@ -17,7 +17,13 @@ const trimRequest = require('trim-request')
 /*
  * Get all items route
  */
-router.get('/all', controller.getAllItems)
+router.get(
+  '/all',
+  requireAuth,
+  AuthController.roleAuthorization(['user', 'admin']),
+  trimRequest.all,
+  controller.getAllItems
+)
 
 /*
  * Get items route
@@ -40,6 +46,29 @@ router.post(
   trimRequest.all,
   validate.createItem,
   controller.createItem
+)
+
+/*
+ * Create new item route
+ */
+router.post(
+  '/users/:UserId',
+  requireAuth,
+  AuthController.roleAuthorization(['user','admin']),
+  trimRequest.all,
+  validate.createUserItem,
+  controller.createUserItem
+)
+
+/*
+ * Get flat by UserId route
+ */
+router.get(
+  '/user',
+  requireAuth,
+  AuthController.roleAuthorization(['user','admin']),
+  trimRequest.all,
+  controller.getItemByUserId
 )
 
 /*

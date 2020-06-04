@@ -18,6 +18,28 @@ exports.createItem = [
 ]
 
 /**
+ * Validates create new item request
+ */
+exports.createUserItem = [
+  check('name')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .trim(),
+  check('UserId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
+  (req, res, next) => {
+    validationResult(req, res, next)
+  }
+]
+
+/**
  * Validates update item request
  */
 exports.updateItem = [

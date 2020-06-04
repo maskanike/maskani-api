@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: maskani-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      labels:
+        app: core
+        tier: backend
+        type: app
+        name: maskani-api
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: maskani-api
+        image: gcr.io/maskani/maskani-api:1.0.0
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 40
+          timeoutSeconds: 5
+        envFrom:
+          - secretRef:
+              name: maskani-api-secrets
+          - secretRef:
+              name: cloudsql-db-credentials
+        ports:
+          - containerPort: 3000
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.12
+        command:
+          - /cloud_sql_proxy
+          - -instances=flatspad:europe-west1:flatspad-prod=tcp:5432
+          - -credential_file=/secrets/cloudsql/credentials.json
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+
