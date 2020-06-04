@@ -226,13 +226,13 @@ module.exports = {
     }<p style="margin-bottom: 25px;">Dear ${user.name},</p>`
       + `<p style="margin-bottom: 25px;">Thank you for being a tenant at <b> ${notificationMetaData.flat} </b> unit  <b> ${notificationMetaData.unit}</b>. `
       + `Your invoice for ${notificationMetaData.month} ${notificationMetaData.year} is ready.</p>`
-      + `<p style="margin-bottom: 25px;">Please pay <b> ${notificationMetaData.totalRentAmount} KSHS</b> before ${invoice.dueDate} .</p> `
+      + `<p style="margin-bottom: 25px;">Please pay <b> ${notificationMetaData.totalRentAmount} KSHS</b> before ${invoice.dueDate}.</p> `
       + '<p style="margin-bottom: 25px;">Your rental breakdown is as follows:</p>'
       + '<ul class="list-group list-group-flush"></ul>'
-      + `<li class="list-group-item">Rent Due: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.rent} </a></li>`
-      + `<li class="list-group-item">Water Bill: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.water} </a></li>`
-      + `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage} </a></li>`
-      + `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty} </a></li>`
+      + `<li class="list-group-item">Rent Due: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.rent}</a></li>`
+      + `<li class="list-group-item">Water Bill: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.water}</a></li>`
+      + `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage}</a></li>`
+      + `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty}</a></li>`
       + '</ul>'
       + '<br>'
       + '<p style="margin-top: 10px;">Sincerely,</p> '
