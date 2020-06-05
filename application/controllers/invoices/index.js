@@ -76,14 +76,19 @@ const getAllItemsFromDB = async (flatId) => {
 /**
  * Update tenant object
  * @param {object} req - request object
+ * @param {number} lastInvoiceSentId - Id of last invoice sent
  */
-const updateTenantObject = async(req) => {
+const updateTenantObject = async(req, lastInvoiceSentId) => {
   return new Promise((resolve, reject) => {
     const lastInvoiceSentAt = new Date();
     Tenant.update(
       { 
-        lastInvoiceSentAt, rent: req.rent, water: req.water,
-        garbage: req.garbage, penalty: req.penalty
+        lastInvoiceSentAt, 
+        rent: req.rent,
+        water: req.water,
+        garbage: req.garbage,
+        penalty: req.penalty,
+        lastInvoiceSentId,
        },
       { where: { id: req.TenantId }, returning: true, plain: true
       }).then((result) => {
@@ -174,9 +179,9 @@ exports.sendItem = async (req, res) => {
     const user = req.user;
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
-    const tenant = await updateTenantObject(req);
-    const flat = await getFlat(tenant.FlatId) // TODO the flat name can be stored as metadata on the tenant model to speed queries
-    const unit = await getUnitByTenantId(tenant.id) // TODO the unit name can be stored as metadata too
+    const tenant = await updateTenantObject(req, invoice.id);
+    const flat = await getFlat(tenant.FlatId)
+    const unit = await getUnitByTenantId(tenant.id)
 
     const totalRentAmount = calculateTotalRent(invoice);
     const notificationMetaData = {

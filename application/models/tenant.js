@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
     lastPaymentMadeAt: DataTypes.DATE,
     lastInvoiceSentAt: DataTypes.DATE,
     lastReceiptSentAt: DataTypes.DATE,
+    lastInvoiceSentId: DataTypes.INTEGER,
+    unitName: DataTypes.STRING, // To make data fetching easier
+    flatName: DataTypes.STRING, // To make data fetching easier
+
   }, {});
   Tenant.associate = (models) => {
     Tenant.belongsTo(models.Flat);
