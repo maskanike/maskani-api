@@ -11,7 +11,7 @@ jobs:
           - POSTGRES_USER: test
           - POSTGRES_PASSWORD: test
     environment:
-      - APP_NAME: maskani-api
+      - APP_NAME: maskani
       - APP_VERSION: 1.0.0
       - REPLICAS: 3
       - PROJECT_NAME: flatspad
