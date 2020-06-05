@@ -10,10 +10,10 @@ deploy_secrets() {
 
     # TODO remove the commented code below. This secrets should not be rotate every time secrets are deployed
     # kubectl delete secret -n $namespace cloudsql-db-credentials || echo "Failed to delete cloudsql-db-credentials. OK for first time deployment."
-    # kubectl create secret -n $namespace generic cloudsql-db-credentials --from-literal=username=postgres --from-literal=password=39IF647MpNxtEuNw
+    # kubectl create secret -n $namespace generic cloudsql-db-credentials --from-literal=username=postgres --from-literal=password=
 
     # kubectl delete secret -n $namespace cloudsql-instance-credentials || echo "Failed to delete cloudsql-instance-credentials. OK for first time deployment."
-    # kubectl create secret -n $namespace generic cloudsql-instance-credentials --from-file=credentials.json=deployment/secrets/flatspad.json
+    # kubectl create secret -n $namespace generic cloudsql-instance-credentials --from-file=credentials.json=secrets/flatspad.json
 
 	fi
 }
