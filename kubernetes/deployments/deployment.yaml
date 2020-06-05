@@ -16,7 +16,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: maskani-api
-        image: gcr.io/maskani/maskani-api:1.0.0
+        image: gcr.io/flatspad/maskani-api:1.0.0
         readinessProbe:
           httpGet:
             path: /health
