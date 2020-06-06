@@ -1,4 +1,4 @@
-const { Flat, Unit } = require('../models')
+const { Flat, Unit, Invoice, Tenant } = require('../models')
 const utils = require('../middleware/utils')
 
 

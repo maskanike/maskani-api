@@ -88,7 +88,7 @@ router.delete(
  * Create a reminder to pay an invoice
  */
 router.post(
-  '/:id/reminder',
+  '/:InvoiceId/reminder',
   requireAuth,
   AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,

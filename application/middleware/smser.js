@@ -156,7 +156,7 @@ module.exports = {
   async sendReminderSMS(user, notificationMetaData) {
     const message = 
       `Hello ${user.name.split(' ')[0]}! This is a polite reminder of your invoice ${notificationMetaData.month} - ${notificationMetaData.year}`
-      + `by ${notificationMetaData.flat}.\n`
+      + ` by ${notificationMetaData.flat}.\n`
       + `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${user.email}.`;
     prepareToSendSMS(user, message)
   }

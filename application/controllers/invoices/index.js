@@ -218,6 +218,8 @@ exports.sendReminder = async (req, res) => {
       month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
       year: getYear(invoice.dueDate),
       totalRentAmount,
+      flat: tenant.flatName,
+      dueDate: invoice.dueDate
     }
     emailer.sendReminderEmail(user, tenant, reminder, notificationMetaData)
     smser.sendReminderSMS(user, notificationMetaData)

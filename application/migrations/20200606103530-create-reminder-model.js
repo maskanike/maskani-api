@@ -7,7 +7,7 @@ module.exports = {
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    reminder: {
+    message: {
       type: Sequelize.STRING,
     },
     createdAt: {
@@ -26,6 +26,6 @@ module.exports = {
       },
     },
   }),
-  down: (queryInterface) => queryInterface.dropTable('Receipts'),
+  down: (queryInterface) => queryInterface.dropTable('Reminders'),
 };
 
