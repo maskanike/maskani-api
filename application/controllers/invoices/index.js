@@ -1,11 +1,11 @@
-const { Flat, Invoice, Tenant, Sequelize } = require('../../models')
+const { Flat, Invoice, Tenant, Reminder, Sequelize } = require('../../models')
 
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
-const { getFlat, getUnitByTenantId } = require('../utils')
+const { getFlat, getInvoice, getUnitByTenantId } = require('../utils')
 const { getYear } = require('date-fns')
 
 const Op = Sequelize.Op;
@@ -194,6 +194,34 @@ exports.sendItem = async (req, res) => {
     emailer.sendInvoiceEmail(user, tenant, invoice, notificationMetaData)
     smser.sendInvoiceSMS(user, notificationMetaData)
     res.status(201).json(invoice)
+    
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Send reminder function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.sendReminder = async (req, res) => {
+  try {
+    const user = req.user;
+    req = matchedData(req)
+    const reminder = await db.createItem(req, Reminder)
+    const invoice = await getInvoice(req.InvoiceId)
+    const tenant = await getTenant(invoice.TenantId)
+    const totalRentAmount = calculateTotalRent(invoice);
+
+    const notificationMetaData = {
+      month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
+      year: getYear(invoice.dueDate),
+      totalRentAmount,
+    }
+    emailer.sendReminderEmail(user, tenant, reminder, notificationMetaData)
+    smser.sendReminderSMS(user, notificationMetaData)
+    res.status(201).json(reminder)
     
   } catch (error) {
     utils.handleError(res, error)

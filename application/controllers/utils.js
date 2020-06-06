@@ -48,6 +48,27 @@ async getFlatBelongingToUser(UserId) {
     })
   },
 
+   /**
+   * Gets invoice by invoiceId
+   * @param {number} id - Id of invoice
+   */
+  async getInvoice(id) {
+    return new Promise((resolve, reject) => {
+      Invoice.findOne(
+        { 
+          where: { id },
+          exclude: ['updatedAt','createdAt'],
+        }).then(invoice => {
+          if(!invoice) {
+            reject(utils.buildErrObject(422, 'INVOICE_NOT_FOUND_FOR_USER'))
+          }
+          resolve(invoice);
+        })
+        .catch(err => {
+          reject(utils.buildErrObject(422, err.message));
+        });
+    })
+  },
   /**
    * Gets unit by tenantId
    * @param {number} TenantId - Id of tenant

@@ -240,4 +240,32 @@ module.exports = {
         EMAIL_FOOTER}`;
     prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
   },
+
+   /**
+   * Sends reminder email
+   * @param {object} user - user object
+   * @param {object} tenant - tenant object
+   * @param {object} invoice - invoice object
+   * @param {object} notificationMetaData - metadata used to send notification
+   */
+  async sendReminderEmail(user, tenant, invoice, notificationMetaData) {
+    const subject = `Your Invoice for ${notificationMetaData.month} - ${notificationMetaData.year} | ${tenant.flatName}`;
+
+    const htmlMessage = `${EMAIL_HEADER
+    }<p style="margin-bottom: 25px;">Dear ${user.name},</p>`
+      + `<p style="margin-bottom: 25px;">This is a polite reminder to pay your invoice for <b> ${notificationMetaData.month} - ${notificationMetaData.year} </b>`
+      + `<p style="margin-bottom: 25px;">Kshs <b> ${notificationMetaData.totalRentAmount} KSHS</b> is due on  ${invoice.dueDate}.</p> `
+      + '<p style="margin-bottom: 25px;">Your rental breakdown is as follows:</p>'
+      + '<ul class="list-group list-group-flush"></ul>'
+      + `<li class="list-group-item">Rent Due: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.rent}</a></li>`
+      + `<li class="list-group-item">Water Bill: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.water}</a></li>`
+      + `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage}</a></li>`
+      + `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty}</a></li>`
+      + '</ul>'
+      + '<br>'
+      + '<p style="margin-top: 10px;">Sincerely,</p> '
+      + `<p style="margin-top: 2px;">The Maskani Team</p>${
+        EMAIL_FOOTER}`;
+    prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
+  },
 }

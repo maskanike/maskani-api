@@ -136,6 +136,27 @@ exports.deleteItem = [
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY'),
+  check('invoiceId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
+  (req, res, next) => {
+    validationResult(req, res, next)
+  }
+]
+
+/**
+ * Validates send reminder request
+ */
+exports.sendReminder = [
+  check('reminder')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
   (req, res, next) => {
     validationResult(req, res, next)
   }

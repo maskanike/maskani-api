@@ -170,7 +170,7 @@ exports.createItem = async (req, res) => {
     req = matchedData(req)
     const doesTenantExists = await tenantExists(req.name, req.phone)
     if (!doesTenantExists) {
-      const tenant = await db.createItem({ ...req, FlatId: flat.id }, Tenant)
+      const tenant = await db.createItem({ ...req, FlatId: flat.id, flatName: flat.name }, Tenant)
       const updatedTenant = await assignTenantToUnit(tenant.id, req.UnitId, flat.id)
       res.status(201).json(updatedTenant);
     }
