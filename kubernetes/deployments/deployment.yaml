@@ -5,6 +5,12 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: core
+      tier: backend
+      type: app
+      name: maskani-api
   template:
     metadata:
       labels:
