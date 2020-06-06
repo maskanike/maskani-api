@@ -5,7 +5,7 @@ const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
-const { getFlat, getInvoice, getUnitByTenantId } = require('../utils')
+const { getFlat, getInvoice, getTenant, getUnitByTenantId } = require('../utils')
 const { getYear } = require('date-fns')
 
 const Op = Sequelize.Op;
