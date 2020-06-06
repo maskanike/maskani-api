@@ -1,11 +1,11 @@
-const { Flat, Invoice, Tenant, Sequelize } = require('../../models')
+const { Flat, Invoice, Tenant, Reminder, Sequelize } = require('../../models')
 
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
-const { getFlat, getUnitByTenantId } = require('../utils')
+const { getInvoice, getTenant } = require('../utils')
 const { getYear } = require('date-fns')
 
 const Op = Sequelize.Op;
@@ -76,14 +76,19 @@ const getAllItemsFromDB = async (flatId) => {
 /**
  * Update tenant object
  * @param {object} req - request object
+ * @param {number} lastInvoiceSentId - Id of last invoice sent
  */
-const updateTenantObject = async(req) => {
+const updateTenantObject = async(req, lastInvoiceSentId) => {
   return new Promise((resolve, reject) => {
     const lastInvoiceSentAt = new Date();
     Tenant.update(
       { 
-        lastInvoiceSentAt, rent: req.rent, water: req.water,
-        garbage: req.garbage, penalty: req.penalty
+        lastInvoiceSentAt, 
+        rent: req.rent,
+        water: req.water,
+        garbage: req.garbage,
+        penalty: req.penalty,
+        lastInvoiceSentId,
        },
       { where: { id: req.TenantId }, returning: true, plain: true
       }).then((result) => {
@@ -174,21 +179,49 @@ exports.sendItem = async (req, res) => {
     const user = req.user;
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
-    const tenant = await updateTenantObject(req);
-    const flat = await getFlat(tenant.FlatId) // TODO the flat name can be stored as metadata on the tenant model to speed queries
-    const unit = await getUnitByTenantId(tenant.id) // TODO the unit name can be stored as metadata too
+    const tenant = await updateTenantObject(req, invoice.id);
 
     const totalRentAmount = calculateTotalRent(invoice);
     const notificationMetaData = {
       month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
       year: getYear(invoice.dueDate),
       totalRentAmount,
-      flat: flat.name,
-      unit: unit.name,
+      flat: tenant.flatName,
+      unit: tenant.unitName,
     }
     emailer.sendInvoiceEmail(user, tenant, invoice, notificationMetaData)
     smser.sendInvoiceSMS(user, notificationMetaData)
     res.status(201).json(invoice)
+    
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Send reminder function called by route
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.sendReminder = async (req, res) => {
+  try {
+    const user = req.user;
+    req = matchedData(req)
+    const reminder = await db.createItem(req, Reminder)
+    const invoice = await getInvoice(req.InvoiceId)
+    const tenant = await getTenant(invoice.TenantId)
+    const totalRentAmount = calculateTotalRent(invoice);
+
+    const notificationMetaData = {
+      month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
+      year: getYear(invoice.dueDate),
+      totalRentAmount,
+      flat: tenant.flatName,
+      dueDate: invoice.dueDate
+    }
+    emailer.sendReminderEmail(user, tenant, reminder, notificationMetaData)
+    smser.sendReminderSMS(user, notificationMetaData)
+    res.status(201).json(reminder)
     
   } catch (error) {
     utils.handleError(res, error)

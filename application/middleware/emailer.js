@@ -240,4 +240,28 @@ module.exports = {
         EMAIL_FOOTER}`;
     prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
   },
+
+   /**
+   * Sends reminder email
+   * @param {object} user - user object
+   * @param {object} tenant - tenant object
+   * @param {object} reminder - reminder object
+   * @param {object} notificationMetaData - metadata used to send notification
+   */
+  async sendReminderEmail(user, tenant, reminder, notificationMetaData) {
+    const subject = `Your Invoice for ${notificationMetaData.month} - ${notificationMetaData.year} | ${notificationMetaData.flat}`;
+
+    const htmlMessage = `${EMAIL_HEADER
+    }<p style="margin-bottom: 25px;">Dear ${user.name},</p>`
+      + `<p style="margin-bottom: 25px;">This is a polite reminder to pay your invoice for <b> ${notificationMetaData.month} - ${notificationMetaData.year} </b>`
+      + `<p style="margin-bottom: 25px;">Kshs <b> ${notificationMetaData.totalRentAmount} KSHS</b> is due on ${notificationMetaData.dueDate}.</p> `
+      + '<p style="margin-bottom: 25px;">Message sent by admin:</p>'
+      + `<p style="margin-bottom: 25px;"><b> ${reminder.message} <b></p>`
+      + '</ul>'
+      + '<br>'
+      + '<p style="margin-top: 10px;">Sincerely,</p> '
+      + `<p style="margin-top: 2px;">The Maskani Team</p>${
+        EMAIL_FOOTER}`;
+    prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
+  },
 }

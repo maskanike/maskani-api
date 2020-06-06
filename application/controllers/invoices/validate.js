@@ -140,3 +140,24 @@ exports.deleteItem = [
     validationResult(req, res, next)
   }
 ]
+
+/**
+ * Validates send reminder request
+ */
+exports.sendReminder = [
+  check('message')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
+  check('InvoiceId')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
+  (req, res, next) => {
+    validationResult(req, res, next)
+  }
+]
