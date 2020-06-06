@@ -5,7 +5,7 @@ const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
-const { getFlat, getInvoice, getTenant, getUnitByTenantId } = require('../utils')
+const { getInvoice, getTenant } = require('../utils')
 const { getYear } = require('date-fns')
 
 const Op = Sequelize.Op;
@@ -180,16 +180,14 @@ exports.sendItem = async (req, res) => {
     req = matchedData(req)
     const invoice = await db.createItem(req, Invoice)
     const tenant = await updateTenantObject(req, invoice.id);
-    const flat = await getFlat(tenant.FlatId)
-    const unit = await getUnitByTenantId(tenant.id)
 
     const totalRentAmount = calculateTotalRent(invoice);
     const notificationMetaData = {
       month: invoice.dueDate.toLocaleString('en-us', { month: 'short' }),
       year: getYear(invoice.dueDate),
       totalRentAmount,
-      flat: flat.name,
-      unit: unit.name,
+      flat: tenant.flatName,
+      unit: tenant.unitName,
     }
     emailer.sendInvoiceEmail(user, tenant, invoice, notificationMetaData)
     smser.sendInvoiceSMS(user, notificationMetaData)
