@@ -12,7 +12,7 @@ spec:
   tls:
   - hosts:
     - api.staging.maskani.co.ke
-    secretName: maskani-tls
+    secretName: maskani-api-tls
   rules:
     - host: api.staging.maskani.co.ke
       http:
