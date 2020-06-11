@@ -20,7 +20,6 @@ exports.getBrowserInfo = (req) => req.headers['user-agent']
 exports.getCountry = (req) =>
   req.headers['cf-ipcountry'] ? req.headers['cf-ipcountry'] : 'KE'
 
-
 /**
  * Handles error by printing to console in development env and builds and sends an error response
  * @param {Object} res - response object
@@ -45,6 +44,7 @@ exports.handleError = (res, err) => {
  * @param {string} message - error text
  */
 exports.buildErrObject = (code, message) => {
+  console.log(code, message)
     return {
       code,
       message

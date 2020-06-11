@@ -98,7 +98,7 @@ const checkLoginAttemptsAndBlockExpires = async (user) => {
       user.loginAttempts = 0; // update in memory object
       User.update(
         { loginAttempts: 0 },
-        { where: {id: user.id }}
+        { where: { id: user.id }}
       ).then(result => {
           if (result) { 
             resolve(true)
