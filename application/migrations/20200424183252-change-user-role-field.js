@@ -3,8 +3,7 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.changeColumn('Users', 'role', { type: Sequelize.STRING, }, { transaction });
-      const pgEnumDropQuery = queryInterface.QueryGenerator.pgEnumDrop('Users', 'role');
-      await queryInterface.sequelize.query(pgEnumDropQuery, { transaction });
+      await queryInterface.sequelize.query(queryInterface.QueryGenerator.pgEnumDrop('Users', 'role'), { transaction });
 
       await queryInterface.changeColumn('Users', 'role', {
         type: Sequelize.ENUM,
@@ -27,14 +26,14 @@ module.exports = {
       const transaction = await queryInterface.sequelize.transaction();
       try {
         await queryInterface.changeColumn('Users', 'role', { type: Sequelize.STRING, }, { transaction });
-        const pgEnumDropQuery = queryInterface.QueryGenerator.pgEnumDrop('Users', 'role');
-        await queryInterface.sequelize.query(pgEnumDropQuery);
+        await queryInterface.sequelize.query(queryInterface.QueryGenerator.pgEnumDrop('Users', 'role'), { transaction });
         await queryInterface.changeColumn('Users', 'role', {
           type: Sequelize.ENUM,
           values: ['landlord', 'agent', 'tenant'],
         }, { transaction });
 
         await queryInterface.removeColumn('Users', 'userType', { transaction });
+        await queryInterface.sequelize.query(queryInterface.QueryGenerator.pgEnumDrop('Users', 'userType'), { transaction });
 
         await transaction.commit();
       } catch (err) {

@@ -28,6 +28,10 @@ app.use(passport.initialize())
 app.use(helmet())
 app.use(require('./routes'))
 
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'resource not found' });
+});
+
 app.listen(app.get('port'), () => {
   console.log(`maskani api listening on port ${app.get('port')}!`);
 })

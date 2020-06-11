@@ -12,7 +12,7 @@ module.exports = {
     }
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.removeColumn('Tenants', 'lastInvoiceSentId', { type: Sequelize.INTEGER, }, { transaction });
