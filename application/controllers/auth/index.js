@@ -215,11 +215,11 @@ const verificationExists = async (id) => {
  */
 const verifyUser = async (user) => {
   return new Promise((resolve, reject) => {
-    User.update({ verified: true }, { where: { id: user.id } })
+    User.update({ verified: true }, { where: { id: user.id }, returning: true, plain: true })
       .then((item) => {
         resolve({
-          email: item.email,
-          verified: item.verified
+          email: item[1].dataValues.email,
+          verified: item[1].dataValues.verified
         })
       })
       .catch(err => {
