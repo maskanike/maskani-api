@@ -15,9 +15,9 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.removeColumn('Tenants', 'lastInvoiceSentId', { type: Sequelize.INTEGER, }, { transaction });
-      await queryInterface.removeColumn('Tenants', 'flatName', { type: Sequelize.STRING }, { transaction });
-      await queryInterface.removeColumn('Tenants', 'unitName', { type: Sequelize.STRING }, { transaction });
+      await queryInterface.removeColumn('Tenants', 'lastInvoiceSentId', { transaction });
+      await queryInterface.removeColumn('Tenants', 'flatName', { transaction });
+      await queryInterface.removeColumn('Tenants', 'unitName', { transaction });
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
