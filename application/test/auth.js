@@ -37,10 +37,8 @@ describe('*********** AUTH ***********', () => {
 
   after(async () => {
     await User.destroy({
-      where: {
-        email: loginDetails.email,
-        password: loginDetails.password
-      }
+      where: {},
+      truncate: true
     })
   })
 
