@@ -28,7 +28,7 @@ const saveUserAccessAndReturnToken = async (req, user) => {
       country: utils.getCountry(req)
     }
     UserAccess.create(userAccess)
-      .then(() => {
+      .then((item) => {
         const userInfo = setUserInfo(user)
         // Returns data with access token
         resolve({
@@ -132,7 +132,6 @@ const userIsBlocked = async (user) => {
  */
 const findUser = async (email) => {
   return new Promise((resolve, reject) => {
-    console.log(email);
     User.findOne({
       where: { email },  // TODO all emails should be lowercase. Undo after validating this for all input
       attributes: ['password', 'loginAttempts', 'blockExpires', 'name', 'email', 'role', 'verified', 'verification', 'id'],
@@ -156,12 +155,12 @@ const findUser = async (email) => {
 const findUserById = async (userId) => {
   return new Promise((resolve, reject) => {
     User.findByPk(userId)
-    then(user => {
-      if (!user) {
-        reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
-      }
-      resolve(user)
-    })
+      .then(user => {
+        if (!user) {
+          reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
+        }
+        resolve(user)
+      })
       .catch(err => {
         reject(utils.buildErrObject(422, err.message))
       });
@@ -568,8 +567,6 @@ exports.resetPassword = async (req, res) => {
   try {
     const data = matchedData(req)
     const forgotPassword = await findForgotPassword(data.id)
-    console.log(forgotPassword.email)
-
     const user = await findUserToResetPassword(forgotPassword.email)
     await updatePassword(data.password, user)
     const result = await markResetPasswordAsUsed(req, forgotPassword)
