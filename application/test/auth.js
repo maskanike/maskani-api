@@ -2,7 +2,7 @@
 
 process.env.NODE_ENV = 'test'
 
-const { User } = require('../models')
+const { User, ForgotPassword } = require('../models')
 const faker = require('faker')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
@@ -36,10 +36,11 @@ describe('*********** AUTH ***********', () => {
   })
 
   after(async () => {
-    await User.destroy({
+    await ForgotPassword.destroy({
       where: {},
       truncate: true
     })
+    await User.destroy({ where: {} })
   })
 
   describe('/GET /', () => {
