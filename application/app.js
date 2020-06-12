@@ -1,4 +1,6 @@
-require('dotenv-safe').config()
+require('dotenv-safe').config({
+  example: process.env.CI ? '.env.ci.example' : '.env.example'
+})
 
 const cors = require('cors')
 const bodyParser = require('body-parser')
