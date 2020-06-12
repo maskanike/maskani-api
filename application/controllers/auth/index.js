@@ -132,8 +132,9 @@ const userIsBlocked = async (user) => {
  */
 const findUser = async (email) => {
   return new Promise((resolve, reject) => {
+    console.log(email);
     User.findOne({
-      where: { email },
+      where: { email },  // TODO all emails should be lowercase. Undo after validating this for all input
       attributes: ['password', 'loginAttempts', 'blockExpires', 'name', 'email', 'role', 'verified', 'verification', 'id'],
     })
       .then(user => {
@@ -300,16 +301,16 @@ const findUserToResetPassword = async (email) => {
  */
 const findForgotPassword = async (id) => {
   return new Promise((resolve, reject) => {
-    ForgotPassword.findOne(
-      {
-        verification: id,
-        used: false
-      },
-      (err, item) => {
-        utils.itemNotFound(err, item, reject, 'NOT_FOUND_OR_ALREADY_USED')
+    ForgotPassword.findOne({ where: { verification: id, used: false } })
+      .then(item => {
+        if (!item) {
+          reject(utils.buildErrObject(422, 'NOT_FOUND_OR_ALREADY_USED'));
+        }
         resolve(item)
-      }
-    )
+      })
+      .catch(err => {
+        reject(utils.buildErrObject(422, err.message));
+      })
   })
 }
 
@@ -567,6 +568,8 @@ exports.resetPassword = async (req, res) => {
   try {
     const data = matchedData(req)
     const forgotPassword = await findForgotPassword(data.id)
+    console.log(forgotPassword.email)
+
     const user = await findUserToResetPassword(forgotPassword.email)
     await updatePassword(data.password, user)
     const result = await markResetPasswordAsUsed(req, forgotPassword)

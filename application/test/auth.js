@@ -164,6 +164,7 @@ describe('*********** AUTH ***********', () => {
 
   describe('/POST reset', () => {
     it('it should POST reset', (done) => {
+      console.log(email, verificationForgot)
       chai
         .request(app)
         .post('/reset')

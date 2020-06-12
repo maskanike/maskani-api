@@ -8,7 +8,7 @@ const hashPassword = (user) => {
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     name: DataTypes.STRING,
-    email: DataTypes.STRING,
+    email: { type: DataTypes.STRING, isEmail: true, isLowercase: true, notNull: true },
     phone: { type: DataTypes.STRING, field: 'msisdn' },
     password: { 
       type: DataTypes.STRING, 

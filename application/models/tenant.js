@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Tenant = sequelize.define('Tenant', {
     name: DataTypes.STRING,
-    email: DataTypes.STRING,
+    email: { type: DataTypes.STRING, isEmail: true, isLowercase: true, notNull: true },
     phone: { type: DataTypes.STRING, field: 'msisdn' },
     rent: DataTypes.INTEGER,
     deposit: DataTypes.INTEGER,

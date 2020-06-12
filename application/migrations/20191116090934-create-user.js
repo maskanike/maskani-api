@@ -10,7 +10,7 @@ module.exports = {
       type: Sequelize.STRING,
     },
     email: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING, isEmail: true, isLowercase: true, notNull: true
     },
     msisdn: {
       type: Sequelize.STRING,

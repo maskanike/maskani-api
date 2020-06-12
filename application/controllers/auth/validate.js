@@ -18,7 +18,8 @@ exports.register = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isEmail()
-    .withMessage('EMAIL_IS_NOT_VALID'),
+    .withMessage('EMAIL_IS_NOT_VALID')
+    .normalizeEmail(),
   check('msisdn')
     .exists()
     .withMessage('MISSING')
@@ -51,7 +52,8 @@ exports.login = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isEmail()
-    .withMessage('EMAIL_IS_NOT_VALID'),
+    .withMessage('EMAIL_IS_NOT_VALID')
+    .normalizeEmail(),
   check('password')
     .exists()
     .withMessage('MISSING')
@@ -93,7 +95,8 @@ exports.forgotPassword = [
     .isEmpty()
     .withMessage('IS_EMPTY')
     .isEmail()
-    .withMessage('EMAIL_IS_NOT_VALID'),
+    .withMessage('EMAIL_IS_NOT_VALID')
+    .normalizeEmail(),
   (req, res, next) => {
     validationResult(req, res, next)
   }
