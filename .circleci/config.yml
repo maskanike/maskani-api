@@ -18,7 +18,6 @@ jobs:
       - CLUSTER_NAME: flatspad-k8s-large
       - CLUSTER_ZONE: europe-west1-d
       - TEST_DB_NAME: saal_db
-      - DB_NAME: saal_db
       - DB_USERNAME: test
       - DB_PASSWORD: test
       - TERM: xterm
