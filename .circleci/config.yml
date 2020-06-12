@@ -21,6 +21,8 @@ jobs:
       - DB_USERNAME: test
       - DB_PASSWORD: test
       - TERM: xterm
+      - JWT_SECRET: myStrongSecretThatIShouldChange
+      - JWT_EXPIRATION_IN_MINUTES: 4320
     working_directory: ~/app
     steps:
       - checkout
