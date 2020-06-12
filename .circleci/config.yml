@@ -18,10 +18,11 @@ jobs:
       - CLUSTER_NAME: flatspad-k8s-large
       - CLUSTER_ZONE: europe-west1-d
       - TEST_DB_NAME: saal_db
-      - DB_NAME: saal_db
       - DB_USERNAME: test
       - DB_PASSWORD: test
       - TERM: xterm
+      - JWT_SECRET: myStrongSecretThatIShouldChange
+      - JWT_EXPIRATION_IN_MINUTES: 4320
     working_directory: ~/app
     steps:
       - checkout
@@ -54,7 +55,7 @@ jobs:
       - run: 
           name: Run Tests
           command: |
-            cd application && yarn install
+            cd application && yarn install && yarn test
       - run:
           name: Build Image
           command: |

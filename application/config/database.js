@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config()
 
 const pgDbObject = {
   database: process.env.DB_NAME,
@@ -6,12 +6,12 @@ const pgDbObject = {
   password: process.env.DB_PASSWORD,
   host: '127.0.0.1',
   port: '5432',
-  dialect: 'postgres',
-};
+  dialect: 'postgres'
+}
 
 module.exports = {
   development: { ...pgDbObject },
   test: { ...pgDbObject, database: process.env.TEST_DB_NAME },
   sandbox: { ...pgDbObject, database: 'maskani_sb' },
-  production: { ...pgDbObject, database: 'maskani_prod' },
-};
+  production: { ...pgDbObject, database: 'maskani_prod' }
+}

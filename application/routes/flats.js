@@ -54,7 +54,7 @@ router.post(
 router.post(
   '/users/:UserId',
   requireAuth,
-  AuthController.roleAuthorization(['user','admin']),
+  AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,
   validate.createUserItem,
   controller.createUserItem
@@ -66,7 +66,7 @@ router.post(
 router.get(
   '/user',
   requireAuth,
-  AuthController.roleAuthorization(['user','admin']),
+  AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,
   controller.getItemByUserId
 )

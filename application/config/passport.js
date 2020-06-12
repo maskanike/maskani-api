@@ -37,12 +37,12 @@ const jwtOptions = {
  */
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
   User.findByPk(payload.data.id)
-    .then(user => {
+    .then((user) => {
       return !user ? done(null, false) : done(null, user)
     })
-    .catch(err => {
+    .catch((err) => {
       return done(err, false)
-    });
+    })
 })
 
 passport.use(jwtLogin)

@@ -3,12 +3,11 @@ const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 /*********************
  * Private functions *
  *********************/
-
 
 /**
  * Gets profile from database by id
@@ -16,8 +15,8 @@ const Op = Sequelize.Op;
  */
 const getFlatFromUserId = async (id) => {
   return new Promise((resolve, reject) => {
-    Flat.findAll({ where: { UserId: id }})
-      .then(flat => {
+    Flat.findAll({ where: { UserId: id } })
+      .then((flat) => {
         if (!flat) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
@@ -26,7 +25,7 @@ const getFlatFromUserId = async (id) => {
         }
         resolve(flat[0])
       })
-      .catch(err => {
+      .catch((err) => {
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -39,17 +38,16 @@ const getFlatFromUserId = async (id) => {
  */
 const flatExistsExcludingItself = async (id, name) => {
   return new Promise((resolve, reject) => {
-    Flat.findOne(
-      { where: { name, id: { [Op.ne]: id }}
-    }).then(item => {
-        if(item){
+    Flat.findOne({ where: { name, id: { [Op.ne]: id } } })
+      .then((item) => {
+        if (item) {
           reject(utils.buildErrObject(422, 'FLAT_ALREADY_EXISTS'))
         }
-        resolve(false);
+        resolve(false)
       })
-      .catch(err => {
-        reject(utils.buildErrObject(422, err.message));
-      });
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -59,16 +57,16 @@ const flatExistsExcludingItself = async (id, name) => {
  */
 const flatExists = async (name) => {
   return new Promise((resolve, reject) => {
-    Flat.findOne({ where: { name }}
-    ).then(item => {
-      if(item){
-        reject(utils.buildErrObject(422, 'FLAT_ALREADY_EXISTS'))
-      }
-      resolve(false);
-    })
-    .catch(err => {
-      reject(utils.buildErrObject(422, err.message));
-    });
+    Flat.findOne({ where: { name } })
+      .then((item) => {
+        if (item) {
+          reject(utils.buildErrObject(422, 'FLAT_ALREADY_EXISTS'))
+        }
+        resolve(false)
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -77,16 +75,16 @@ const flatExists = async (name) => {
  */
 const getAllItemsFromDB = async () => {
   return new Promise((resolve, reject) => {
-    Flat.findAll(
-      { 
-        exclude: ['updatedAt','createdAt'],
-        order: [['name', 'DESC']]
-      }).then(items => {
-        resolve(items);
+    Flat.findAll({
+      exclude: ['updatedAt', 'createdAt'],
+      order: [['name', 'DESC']]
+    })
+      .then((items) => {
+        resolve(items)
       })
-      .catch(err => {
-        reject(utils.buildErrObject(422, err.message));
-      });
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 

@@ -4,7 +4,7 @@ const { getFlatBelongingToUser } = require('../utils')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 /*********************
  * Private functions *
@@ -19,17 +19,16 @@ const Op = Sequelize.Op;
  */
 const tenantExistsExcludingItself = async (id, email, phone, FlatId) => {
   return new Promise((resolve, reject) => {
-    Tenant.findOne(
-      { where: { email, phone, FlatId, id: { [Op.ne]: id }}
-    }).then(item => {
-        if(item){
+    Tenant.findOne({ where: { email, phone, FlatId, id: { [Op.ne]: id } } })
+      .then((item) => {
+        if (item) {
           reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
         }
-        resolve(false);
+        resolve(false)
       })
-      .catch(err => {
-        reject(utils.buildErrObject(422, err.message));
-      });
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -40,16 +39,16 @@ const tenantExistsExcludingItself = async (id, email, phone, FlatId) => {
  */
 const tenantExists = async (email, phone) => {
   return new Promise((resolve, reject) => {
-    Tenant.findOne({ where: { email, phone }}
-    ).then(item => {
-      if(item){
-        reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
-      }
-      resolve(false);
-    })
-    .catch(err => {
-      reject(utils.buildErrObject(422, err.message));
-    });
+    Tenant.findOne({ where: { email, phone } })
+      .then((item) => {
+        if (item) {
+          reject(utils.buildErrObject(422, 'TENANT_ALREADY_EXISTS'))
+        }
+        resolve(false)
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -60,17 +59,17 @@ const tenantExists = async (email, phone) => {
  */
 const assignTenantToUnit = async (TenantId, unitId) => {
   return new Promise((resolve, reject) => {
-    Unit.findOne({ where: { id: unitId }}
-    ).then(async(item) => {
-      if(!item){
-        reject(utils.buildErrObject(422, 'UNIT_NOT_FOUND'))
-      }
-      const unit = await db.updateItem(item.id, Unit, { TenantId })
-      resolve(unit);
-    })
-    .catch(err => {
-      reject(utils.buildErrObject(422, err.message));
-    });
+    Unit.findOne({ where: { id: unitId } })
+      .then(async (item) => {
+        if (!item) {
+          reject(utils.buildErrObject(422, 'UNIT_NOT_FOUND'))
+        }
+        const unit = await db.updateItem(item.id, Unit, { TenantId })
+        resolve(unit)
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -80,17 +79,17 @@ const assignTenantToUnit = async (TenantId, unitId) => {
  */
 const getAllItemsFromDB = async (FlatId) => {
   return new Promise((resolve, reject) => {
-    Tenant.findAll(
-      { 
-        where: { FlatId },
-        exclude: ['updatedAt','createdAt'],
-        order: [['name', 'DESC']]
-      }).then(items => {
-        resolve(items);
+    Tenant.findAll({
+      where: { FlatId },
+      exclude: ['updatedAt', 'createdAt'],
+      order: [['name', 'DESC']]
+    })
+      .then((items) => {
+        resolve(items)
       })
-      .catch(err => {
-        reject(utils.buildErrObject(422, err.message));
-      });
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -118,9 +117,11 @@ exports.getAllItems = async (req, res) => {
  */
 exports.getItems = async (req, res) => {
   try {
-    const flat = await getFlatBelongingToUser(req.user.id);
+    const flat = await getFlatBelongingToUser(req.user.id)
     const query = await db.checkQueryString(req.query)
-    res.status(200).json(await db.getItems(req, Tenant, { ...query, FlatId:flat.id }))
+    res
+      .status(200)
+      .json(await db.getItems(req, Tenant, { ...query, FlatId: flat.id }))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -147,10 +148,15 @@ exports.getItem = async (req, res) => {
  */
 exports.updateItem = async (req, res) => {
   try {
-    const flat = await getFlatBelongingToUser(req.user.id);
+    const flat = await getFlatBelongingToUser(req.user.id)
     req = matchedData(req)
     const { id } = req
-    const doesTenantExists = await tenantExistsExcludingItself(id, req.email, req.phone, flat.id)
+    const doesTenantExists = await tenantExistsExcludingItself(
+      id,
+      req.email,
+      req.phone,
+      flat.id
+    )
     if (!doesTenantExists) {
       res.status(200).json(await db.updateItem(id, Tenant, req))
     }
@@ -166,13 +172,20 @@ exports.updateItem = async (req, res) => {
  */
 exports.createItem = async (req, res) => {
   try {
-    const flat = await getFlatBelongingToUser(req.user.id);
+    const flat = await getFlatBelongingToUser(req.user.id)
     req = matchedData(req)
     const doesTenantExists = await tenantExists(req.name, req.phone)
     if (!doesTenantExists) {
-      const tenant = await db.createItem({ ...req, FlatId: flat.id, flatName: flat.name }, Tenant)
-      const updatedTenant = await assignTenantToUnit(tenant.id, req.UnitId, flat.id)
-      res.status(201).json(updatedTenant);
+      const tenant = await db.createItem(
+        { ...req, FlatId: flat.id, flatName: flat.name },
+        Tenant
+      )
+      const updatedTenant = await assignTenantToUnit(
+        tenant.id,
+        req.UnitId,
+        flat.id
+      )
+      res.status(201).json(updatedTenant)
     }
   } catch (error) {
     utils.handleError(res, error)

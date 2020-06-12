@@ -1,4 +1,4 @@
-const { User } = require('../../models');
+const { User } = require('../../models')
 const utils = require('../../middleware/utils')
 const { matchedData } = require('express-validator')
 const auth = require('../../middleware/auth')
@@ -14,13 +14,13 @@ const auth = require('../../middleware/auth')
 const getProfileFromDB = async (id) => {
   return new Promise((resolve, reject) => {
     User.findByPk(id)
-      .then(user => {
+      .then((user) => {
         if (!user) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
         resolve(user)
       })
-      .catch(err => {
+      .catch((err) => {
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -33,16 +33,14 @@ const getProfileFromDB = async (id) => {
  */
 const updateProfileInDB = async (req, id) => {
   return new Promise((resolve, reject) => {
-    User.update(
-      req,
-      { where: {id}, returning: true, plain: true})
-      .then(result => {
-        if(!result){
+    User.update(req, { where: { id }, returning: true, plain: true })
+      .then((result) => {
+        if (!result) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
         resolve(result[1].dataValues)
       })
-      .catch(err => {
+      .catch((err) => {
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -54,16 +52,16 @@ const updateProfileInDB = async (req, id) => {
  */
 const findUser = async (id) => {
   return new Promise((resolve, reject) => {
-    User.findByPk(id, {attributes: ['password', 'email']})
-    .then(user => {
-      if (!user) {
-        reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
-      }
-      resolve(user)
-    })
-    .catch(err => {
-      reject(utils.buildErrObject(422, err.message))
-    })
+    User.findByPk(id, { attributes: ['password', 'email'] })
+      .then((user) => {
+        if (!user) {
+          reject(utils.buildErrObject(422, 'USER_DOES_NOT_EXIST'))
+        }
+        resolve(user)
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
   })
 }
 
@@ -85,15 +83,16 @@ const passwordsDoNotMatch = async () => {
 const changePasswordInDB = async (id, req) => {
   return new Promise((resolve, reject) => {
     User.update(
-      { password: req.newPassword},
-      { where: { id }, individualHooks: true })
-      .then(user => {
-        if(!user) {
+      { password: req.newPassword },
+      { where: { id }, individualHooks: true }
+    )
+      .then((user) => {
+        if (!user) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
         resolve(utils.buildSuccObject('PASSWORD_CHANGED'))
       })
-      .catch(err => {
+      .catch((err) => {
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -138,7 +137,7 @@ exports.updateProfile = async (req, res) => {
  */
 exports.changePassword = async (req, res) => {
   try {
-    const {id} = req.user
+    const { id } = req.user
     const user = await findUser(id)
     req = matchedData(req)
     const isPasswordMatch = await auth.checkPassword(req.oldPassword, user)

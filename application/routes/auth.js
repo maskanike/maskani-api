@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const controller = require('../controllers/auth/index')
 const validate = require('../controllers/auth/validate')
 const trimRequest = require('trim-request')
@@ -14,7 +14,7 @@ router.post(
   trimRequest.all,
   validate.register,
   controller.register
-);
+)
 
 /*
  * Verify route
@@ -57,4 +57,4 @@ router.get(
  */
 router.post('/login', trimRequest.all, validate.login, controller.login)
 
-module.exports = router;
+module.exports = router

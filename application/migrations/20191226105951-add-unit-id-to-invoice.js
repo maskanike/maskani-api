@@ -1,17 +1,12 @@
-
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.addColumn('Invoices',
-    'UnitId',
-    {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.addColumn('Invoices', 'UnitId', {
       type: Sequelize.INTEGER,
       references: {
         model: 'Units',
-        key: 'id',
-      },
+        key: 'id'
+      }
     }),
 
-  down: (queryInterface) => queryInterface.removeColumn(
-    'Invoices',
-    'UnitId',
-  ),
-};
+  down: (queryInterface) => queryInterface.removeColumn('Invoices', 'UnitId')
+}
