@@ -1,7 +1,6 @@
 const { Flat, Unit, Invoice, Tenant } = require('../models')
 const utils = require('../middleware/utils')
 
-
 module.exports = {
   /**
    * Gets flat belonging to user
@@ -9,20 +8,20 @@ module.exports = {
    */
   async getFlatBelongingToUser(UserId) {
     return new Promise((resolve, reject) => {
-      Flat.findOne(
-        {
-          where: { UserId },
-          exclude: ['updatedAt', 'createdAt'],
-          order: [['name', 'DESC']]
-        }).then(flat => {
+      Flat.findOne({
+        where: { UserId },
+        exclude: ['updatedAt', 'createdAt'],
+        order: [['name', 'DESC']]
+      })
+        .then((flat) => {
           if (!flat) {
             reject(utils.buildErrObject(422, 'FLAT_NOT_FOUND_FOR_USER'))
           }
-          resolve(flat);
+          resolve(flat)
         })
-        .catch(err => {
-          reject(utils.buildErrObject(422, err.message));
-        });
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
     })
   },
 
@@ -32,65 +31,65 @@ module.exports = {
    */
   async getFlat(id) {
     return new Promise((resolve, reject) => {
-      Flat.findOne(
-        {
-          where: { id },
-          exclude: ['updatedAt', 'createdAt'],
-        }).then(flat => {
+      Flat.findOne({
+        where: { id },
+        exclude: ['updatedAt', 'createdAt']
+      })
+        .then((flat) => {
           if (!flat) {
             reject(utils.buildErrObject(422, 'FLAT_NOT_FOUND_FOR_USER'))
           }
-          resolve(flat);
+          resolve(flat)
         })
-        .catch(err => {
-          reject(utils.buildErrObject(422, err.message));
-        });
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
     })
   },
 
   /**
-  * Gets invoice by invoiceId
-  * @param {number} id - Id of invoice
-  */
+   * Gets invoice by invoiceId
+   * @param {number} id - Id of invoice
+   */
   async getInvoice(id) {
     return new Promise((resolve, reject) => {
-      Invoice.findOne(
-        {
-          where: { id },
-          exclude: ['updatedAt', 'createdAt'],
-        }).then(invoice => {
+      Invoice.findOne({
+        where: { id },
+        exclude: ['updatedAt', 'createdAt']
+      })
+        .then((invoice) => {
           if (!invoice) {
             reject(utils.buildErrObject(422, 'INVOICE_NOT_FOUND_FOR_USER'))
           }
-          resolve(invoice);
+          resolve(invoice)
         })
-        .catch(err => {
-          reject(utils.buildErrObject(422, err.message));
-        });
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
     })
   },
 
   /**
-  * Gets tenant by TenantId
-  * @param {number} id - Id of Tenant
-  */
- async getTenant(id) {
-  return new Promise((resolve, reject) => {
-    Tenant.findOne(
-      {
+   * Gets tenant by TenantId
+   * @param {number} id - Id of Tenant
+   */
+  async getTenant(id) {
+    return new Promise((resolve, reject) => {
+      Tenant.findOne({
         where: { id },
-        exclude: ['updatedAt', 'createdAt'],
-      }).then(tenant => {
-        if (!tenant) {
-          reject(utils.buildErrObject(422, 'TENANT_NOT_FOUND_FOR_USER'))
-        }
-        resolve(tenant);
+        exclude: ['updatedAt', 'createdAt']
       })
-      .catch(err => {
-        reject(utils.buildErrObject(422, err.message));
-      });
-  })
-},
+        .then((tenant) => {
+          if (!tenant) {
+            reject(utils.buildErrObject(422, 'TENANT_NOT_FOUND_FOR_USER'))
+          }
+          resolve(tenant)
+        })
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
+    })
+  },
 
   /**
    * Gets unit by tenantId
@@ -98,19 +97,19 @@ module.exports = {
    */
   async getUnitByTenantId(TenantId) {
     return new Promise((resolve, reject) => {
-      Unit.findOne(
-        {
-          where: { TenantId },
-          exclude: ['updatedAt', 'createdAt'],
-        }).then(flat => {
+      Unit.findOne({
+        where: { TenantId },
+        exclude: ['updatedAt', 'createdAt']
+      })
+        .then((flat) => {
           if (!flat) {
             reject(utils.buildErrObject(422, 'FLAT_NOT_FOUND_FOR_USER'))
           }
-          resolve(flat);
+          resolve(flat)
         })
-        .catch(err => {
-          reject(utils.buildErrObject(422, err.message));
-        });
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
     })
   }
 }

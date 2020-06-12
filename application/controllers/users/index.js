@@ -1,4 +1,4 @@
-const models = require('../../models');
+const models = require('../../models')
 const uuid = require('uuid')
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
@@ -22,7 +22,8 @@ const createItem = async (req) => {
       role: req.role,
       phone: req.phone,
       verification: uuid.v4()
-    }).then(item => {
+    })
+      .then((item) => {
         // Removes properties with rest operator
         const removeProperties = ({
           // eslint-disable-next-line no-unused-vars
@@ -35,9 +36,10 @@ const createItem = async (req) => {
         }) => rest
         resolve(removeProperties(item.dataValues))
       })
-    }).catch(err => {
-      reject(utils.buildErrObject(422, err.message))
-    })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
+  })
 }
 
 /********************
@@ -66,7 +68,7 @@ exports.getItems = async (req, res) => {
 exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
-    res.status(200).json(await db.getItem(id, model.User))
+    res.status(200).json(await db.getItem(req, models.User))
   } catch (error) {
     utils.handleError(res, error)
   }
@@ -80,7 +82,7 @@ exports.getItem = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     req = matchedData(req)
-    const { id } = req;
+    const { id } = req
     const doesEmailExists = await emailer.emailExistsExcludingMyself(
       id,
       req.email

@@ -2,12 +2,12 @@ require('dotenv-safe').config()
 
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const express = require('express');
+const express = require('express')
 const helmet = require('helmet')
 const passport = require('passport')
-const morgan = require('morgan');
+const morgan = require('morgan')
 
-const app = express();
+const app = express()
 // Setup express server port from ENV, default: 3000
 app.set('port', process.env.PORT || 3000)
 
@@ -29,11 +29,11 @@ app.use(helmet())
 app.use(require('./routes'))
 
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'resource not found' });
-});
-
-app.listen(app.get('port'), () => {
-  console.log(`maskani api listening on port ${app.get('port')}!`);
+  res.status(404).json({ error: 'resource not found' })
 })
 
-module.exports = app;
+app.listen(app.get('port'), () => {
+  console.log(`maskani api listening on port ${app.get('port')}!`)
+})
+
+module.exports = app

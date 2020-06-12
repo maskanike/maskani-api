@@ -1,12 +1,10 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.addColumn(
-    'Tenants',
-    'receiptAmount',
-    {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.addColumn('Tenants', 'receiptAmount', {
       type: Sequelize.INTEGER,
-      defaultValue: 0,
-    },
-  ),
+      defaultValue: 0
+    }),
 
-  down: (queryInterface) => queryInterface.removeColumn('Tenants', 'receiptAmount'),
-};
+  down: (queryInterface) =>
+    queryInterface.removeColumn('Tenants', 'receiptAmount')
+}

@@ -2,7 +2,7 @@
 
 process.env.NODE_ENV = 'test'
 
-const { User } = require('../models');
+const { User } = require('../models')
 const faker = require('faker')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
@@ -40,8 +40,8 @@ describe('*********** AUTH ***********', () => {
       where: {
         email: loginDetails.email,
         password: loginDetails.password
-      },
-    });
+      }
+    })
   })
 
   describe('/GET /', () => {

@@ -26,17 +26,17 @@ exports.getCountry = (req) =>
  * @param {Object} err - error object
  */
 exports.handleError = (res, err) => {
-    // Prints error in console
-    if (process.env.NODE_ENV === 'development') {
-      console.log(err)
-    }
-    // Sends error to user
-    res.status(err.code).json({
-      errors: {
-        msg: err.message
-      }
-    })
+  // Prints error in console
+  if (process.env.NODE_ENV === 'development') {
+    console.log(err)
   }
+  // Sends error to user
+  res.status(err.code).json({
+    errors: {
+      msg: err.message
+    }
+  })
+}
 
 /**
  * Builds error object
@@ -44,11 +44,11 @@ exports.handleError = (res, err) => {
  * @param {string} message - error text
  */
 exports.buildErrObject = (code, message) => {
-    return {
-      code,
-      message
-    }
+  return {
+    code,
+    message
   }
+}
 
 /**
  * Builds success object
@@ -60,7 +60,6 @@ exports.buildSuccObject = (message) => {
   }
 }
 
-
 /**
  * Builds error for validation files
  * @param {Object} req - request object
@@ -68,17 +67,16 @@ exports.buildSuccObject = (message) => {
  * @param {Object} next - next object
  */
 exports.validationResult = (req, res, next) => {
-    try {
-      validationResult(req).throw()
-      if (req.body.email) {
-        req.body.email = req.body.email.toLowerCase()
-      }
-      return next()
-    } catch (err) {
-      return this.handleError(res, this.buildErrObject(422, err.array()))
+  try {
+    validationResult(req).throw()
+    if (req.body.email) {
+      req.body.email = req.body.email.toLowerCase()
     }
+    return next()
+  } catch (err) {
+    return this.handleError(res, this.buildErrObject(422, err.array()))
   }
-
+}
 
 /**
  * Item already exists
@@ -88,19 +86,18 @@ exports.validationResult = (req, res, next) => {
  * @param {string} message - message
  */
 exports.itemAlreadyExists = (err, item, reject, message) => {
-    if (err) {
-      reject(this.buildErrObject(422, err.message))
-    }
-    if (item) {
-      reject(this.buildErrObject(422, message))
-    }
+  if (err) {
+    reject(this.buildErrObject(422, err.message))
   }
+  if (item) {
+    reject(this.buildErrObject(422, message))
+  }
+}
 
 /**
  * Removes extension from file
  * @param {string} file - filename
  */
 exports.removeExtensionFromFile = (file) => {
-    return file.split('.').slice(0, -1).join('.').toString()
-  }
-  
+  return file.split('.').slice(0, -1).join('.').toString()
+}

@@ -27,7 +27,7 @@ module.exports = {
       })
     })
   },
-  
+
   /**
    * Encrypts text
    * @param {string} text - text to encrypt
