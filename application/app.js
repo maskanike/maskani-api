@@ -2,6 +2,8 @@ require('dotenv-safe').config({
   example: process.env.CI ? '.env.ci.example' : '.env.example'
 })
 
+require('@google-cloud/trace-agent').start()
+
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const express = require('express')
