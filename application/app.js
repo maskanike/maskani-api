@@ -3,7 +3,7 @@ require('dotenv-safe').config({
 })
 
 require('@google-cloud/trace-agent').start({
-  ignoreUrls: [/^\/health/],
+  ignoreUrls: ['/health'],
   ignoreMethods: ['options']
 })
 
