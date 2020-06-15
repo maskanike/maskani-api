@@ -82,6 +82,16 @@ describe('*********** AUTH ***********', () => {
           done()
         })
     })
+    it('it should reject wrong credentials', (done) => {
+      chai
+        .request(app)
+        .post('/login')
+        .send({ email: 'admin@admin.com', password: '54321' })
+        .end((err, res) => {
+          res.should.have.status(409)
+          done()
+        })
+    })
   })
 
   describe('/POST register', () => {

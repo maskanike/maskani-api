@@ -6,6 +6,7 @@ const algorithm = 'aes-192-cbc'
 // 24 bytes (192 bits).
 const key = crypto.scryptSync(secret, 'salt', 24)
 const iv = Buffer.alloc(16, 0) // Initialization crypto vector
+const utils = require('../middleware/utils')
 
 module.exports = {
   /**
@@ -18,7 +19,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       user.comparePassword(password, (err, isMatch) => {
         if (err) {
-          reject(this.buildErrObject(422, err.message))
+          reject(utils.buildErrObject(422, err.message))
         }
         if (!isMatch) {
           resolve(false)
