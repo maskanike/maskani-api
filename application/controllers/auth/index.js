@@ -529,7 +529,6 @@ exports.register = async (req, res) => {
     req = matchedData(req)
     console.log('req: ', req)
     const doesEmailExists = await emailer.emailExists(req.email)
-    console.log('doesEmailExists: ', doesEmailExists)
     if (!doesEmailExists) {
       const item = await registerUser(req)
       console.log('item: ', item)
@@ -541,6 +540,7 @@ exports.register = async (req, res) => {
       res.status(201).json(response)
     }
   } catch (error) {
+    console.error(error)
     utils.handleError(res, error)
   }
 }
