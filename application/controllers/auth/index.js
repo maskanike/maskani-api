@@ -527,11 +527,16 @@ exports.login = async (req, res) => {
 exports.register = async (req, res) => {
   try {
     req = matchedData(req)
+    console.log('req: ', req)
     const doesEmailExists = await emailer.emailExists(req.email)
+    console.log('doesEmailExists: ', doesEmailExists)
     if (!doesEmailExists) {
       const item = await registerUser(req)
+      console.log('item: ', item)
       const userInfo = setUserInfo(item)
+      console.log('user info: ', userInfo)
       const response = returnRegisterToken(item, userInfo)
+      console.log('response: ', response)
       emailer.sendRegistrationEmailMessage(item)
       res.status(201).json(response)
     }
