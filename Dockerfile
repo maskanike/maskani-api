@@ -1,5 +1,5 @@
-FROM node:12.10.0-alpine
-LABEL maintainer="Samuel Magondu <samuel@flatspad.com>"
+FROM node:14.4.0-alpine
+LABEL maintainer="Samuel Magondu <samuel@maskani.co.ke>"
 
 WORKDIR /www
 
