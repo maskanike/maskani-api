@@ -3,8 +3,7 @@ require('dotenv-safe').config({
 })
 
 require('@google-cloud/trace-agent').start({
-  ignoreUrls: ['/health'],
-  ignoreMethods: ['options']
+  ignoreUrls: ['/health']
 })
 
 const cors = require('cors')
