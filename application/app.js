@@ -21,6 +21,9 @@ app.set('port', process.env.PORT || 3000)
 // Enable only in development HTTP request logger middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
+} else {
+  app.set('trust proxy', true)
+  app.use(morgan('combined'))
 }
 
 // for parsing json
