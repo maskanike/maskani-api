@@ -20,7 +20,7 @@ const createdID = []
 let verification = ''
 let verificationForgot = ''
 const email = faker.internet.email()
-const msisdn = '0711223344'
+const phone = '0711223344'
 
 chai.use(chaiHttp)
 
@@ -28,7 +28,7 @@ describe('*********** AUTH ***********', () => {
   before(async () => {
     await User.create({
       name: faker.name.findName(),
-      msisdn: faker.phone.phoneNumber(),
+      phone: faker.phone.phoneNumber(),
       verification: faker.random.uuid(),
       email: loginDetails.email,
       password: loginDetails.password
@@ -100,7 +100,7 @@ describe('*********** AUTH ***********', () => {
         name: faker.random.words(),
         email,
         password: faker.internet.password(),
-        msisdn
+        phone
       }
       chai
         .request(app)
@@ -120,7 +120,7 @@ describe('*********** AUTH ***********', () => {
         name: faker.random.words(),
         email,
         password: faker.random.words(),
-        msisdn
+        phone
       }
       chai
         .request(app)

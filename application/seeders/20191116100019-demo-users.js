@@ -7,7 +7,7 @@ module.exports = {
       {
         id: 1,
         email: 'samuel@flatspad.com',
-        msisdn: '254723453841',
+        phone: '254723453841',
         password,
         name: 'Samuel Magondu',
         status: 'active',
@@ -19,7 +19,7 @@ module.exports = {
       {
         id: 2,
         email: 'magondunjenga@gmail.com',
-        msisdn: '254713849874',
+        phone: '254713849874',
         password,
         name: 'Magondu Njenga',
         status: 'active',
@@ -31,7 +31,7 @@ module.exports = {
       {
         id: 3,
         email: 'eugenenyawara@gmail.com',
-        msisdn: '254725902510',
+        phone: '254725902510',
         password,
         name: 'Eugene Nyawara',
         status: 'active',
@@ -43,7 +43,7 @@ module.exports = {
       {
         id: 4,
         email: 'magonduback@gmail.com',
-        msisdn: '254723453841',
+        phone: '254723453841',
         password,
         name: 'Magondu Back',
         status: 'active',

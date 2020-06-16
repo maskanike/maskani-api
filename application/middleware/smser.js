@@ -20,7 +20,7 @@ const logSMS = async (data) => {
 const logFailedSMSSending = async (data, err) => {
   const failedSMS = {
     message: data.message,
-    destination: data.msisdn,
+    destination: data.phone,
     type: 'sms',
     error: err,
     status: 'failed'
@@ -35,7 +35,7 @@ const logFailedSMSSending = async (data, err) => {
 const logSuccessfulSMSSending = async (data) => {
   const successSMS = {
     message: data.message,
-    destination: data.msisdn,
+    destination: data.phone,
     type: 'sms',
     status: 'success'
   }
@@ -48,7 +48,7 @@ const logSuccessfulSMSSending = async (data) => {
  * @param {boolean} callback - callback
  */
 const sendSMS = async (data, callback) => {
-  const messagePayload = `to=${data.msisdn}&message=${encodeURIComponent(
+  const messagePayload = `to=${data.phone}&message=${encodeURIComponent(
     data.message
   )}&username=${process.env.AT_USERNAME}`
   const options = {
@@ -81,7 +81,7 @@ const sendSMS = async (data, callback) => {
  */
 const prepareToSendSMS = (user, message) => {
   const data = {
-    msisdn: user.phone,
+    phone: user.phone,
     message
   }
   if (process.env.NODE_ENV === 'production') {

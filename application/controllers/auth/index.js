@@ -23,7 +23,7 @@ const setUserInfo = (req) => {
     id: req.id,
     name: req.name,
     email: req.email,
-    msisdn: req.msisdn,
+    phone: req.phone,
     role: req.role,
     verified: req.verified
   }
