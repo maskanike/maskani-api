@@ -1,5 +1,4 @@
 /* eslint handle-callback-err: "off"*/
-
 process.env.NODE_ENV = 'test'
 
 const { User, ForgotPassword } = require('../models')

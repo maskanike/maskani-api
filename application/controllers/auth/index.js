@@ -418,7 +418,7 @@ const forgotPasswordResponse = (item) => {
  * @param {Object} req - request object
  */
 const registerUser = async (req) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     console.log('registerUser: ', req)
     const user = {
       name: req.name,
@@ -428,13 +428,16 @@ const registerUser = async (req) => {
       verification: uuid.v4()
     }
     console.log('user: ', user)
+    const resp = await User.create(user)
+    console.log('resp: ', resp)
+
     User.create(user)
       .then((item) => {
         console.log('item: ', item)
         resolve(item)
       })
       .catch((err) => {
-        console.log('err: ', err)
+        console.error('err: ', err)
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -543,7 +546,7 @@ exports.register = async (req, res) => {
       res.status(201).json(response)
     }
   } catch (error) {
-    console.error(error)
+    console.error('register error: ', error)
     utils.handleError(res, error)
   }
 }

@@ -44,7 +44,7 @@ spec:
         ports:
           - containerPort: 3000
       - name: cloudsql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.12
+        image: gcr.io/cloudsql-docker/gce-proxy:1.17
         command:
           - /cloud_sql_proxy
           - -instances=flatspad:europe-west1:flatspad-prod=tcp:5432
