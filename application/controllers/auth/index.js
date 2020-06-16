@@ -423,7 +423,7 @@ const registerUser = async (req) => {
     User.create({
       name: req.name,
       email: req.email,
-      msisdn: req.msisdn,
+      phone: req.phone,
       password: req.password,
       verification: uuid.v4()
     })

@@ -20,7 +20,7 @@ exports.register = [
     .isEmail()
     .withMessage('EMAIL_IS_NOT_VALID')
     .normalizeEmail(),
-  check('msisdn')
+  check('phone')
     .exists()
     .withMessage('MISSING')
     .not()
