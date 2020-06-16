@@ -425,7 +425,7 @@ const registerUser = async (req) => {
       email: req.email,
       phone: req.phone,
       password: req.password,
-      verification: uuid.v4()
+      verification: 'gvhjkl'
     }
     console.log('user: ', user)
     const resp = await User.create(user)
