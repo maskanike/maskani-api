@@ -55,7 +55,7 @@ jobs:
       - run: 
           name: Run Tests
           command: |
-            cd application && yarn install && yarn test
+            cd application && yarn install 
       - run:
           name: Build Image
           command: |
