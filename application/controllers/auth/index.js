@@ -419,6 +419,7 @@ const forgotPasswordResponse = (item) => {
  */
 const registerUser = async (req) => {
   return new Promise((resolve, reject) => {
+    console.log('registerUser: ', req)
     User.create({
       name: req.name,
       email: req.email,
@@ -427,9 +428,11 @@ const registerUser = async (req) => {
       verification: uuid.v4()
     })
       .then((user) => {
+        console.log('user: ', user)
         resolve(user)
       })
       .catch((err) => {
+        console.log('err: ', err)
         reject(utils.buildErrObject(422, err.message))
       })
   })
@@ -527,13 +530,11 @@ exports.login = async (req, res) => {
 exports.register = async (req, res) => {
   try {
     req = matchedData(req)
-    console.log('req: ', req)
     const doesEmailExists = await emailer.emailExists(req.email)
     if (!doesEmailExists) {
       const item = await registerUser(req)
       console.log('item: ', item)
       const userInfo = setUserInfo(item)
-      console.log('user info: ', userInfo)
       const response = returnRegisterToken(item, userInfo)
       console.log('response: ', response)
       emailer.sendRegistrationEmailMessage(item)
