@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
     host: config.host,
     port: config.port,
     dialect: config.dialect,
-    logging: false,
+    logging: config.logging,
     pool: {
       max: 5,
       min: 0,

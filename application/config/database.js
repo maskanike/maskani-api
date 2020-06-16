@@ -6,7 +6,8 @@ const pgDbObject = {
   password: process.env.DB_PASSWORD,
   host: '127.0.0.1',
   port: '5432',
-  dialect: 'postgres'
+  dialect: 'postgres',
+  logging: console.log
 }
 
 module.exports = {
