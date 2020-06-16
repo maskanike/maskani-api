@@ -427,10 +427,11 @@ const registerUser = async (req) => {
       password: req.password,
       verification: uuid.v4()
     }
+    console.log('user: ', user)
     User.create(user)
       .then((item) => {
         console.log('item: ', item)
-        resolve(user)
+        resolve(item)
       })
       .catch((err) => {
         console.log('err: ', err)
