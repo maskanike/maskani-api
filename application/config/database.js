@@ -12,5 +12,7 @@ const pgDbObject = {
 
 module.exports = {
   development: { ...pgDbObject },
+  sandbox: { ...pgDbObject },
+  production: { ...pgDbObject },
   test: { ...pgDbObject, database: process.env.TEST_DB_NAME }
 }
