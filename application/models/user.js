@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt')
 
-const hashPassword = (user) => {
-  const salt = bcrypt.genSaltSync()
-  user.password = bcrypt.hashSync(user.password, salt)
-  return user
-}
+// const hashPassword = (user) => {
+//   const salt = bcrypt.genSaltSync()
+//   user.password = bcrypt.hashSync(user.password, salt)
+//   return user
+// }
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -28,13 +28,13 @@ module.exports = (sequelize, DataTypes) => {
       verified: { type: DataTypes.BOOLEAN, defaultValue: false },
       loginAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
       blockExpires: { type: DataTypes.DATE, defaultValue: sequelize.NOW }
-    },
-    {
-      hooks: {
-        beforeCreate: (user) => hashPassword(user),
-        beforeUpdate: (user) => hashPassword(user)
-      }
     }
+    // {
+    //   hooks: {
+    //     beforeCreate: (user) => hashPassword(user),
+    //     beforeUpdate: (user) => hashPassword(user)
+    //   }
+    // }
   )
   User.prototype.comparePassword = function (password, cb) {
     return bcrypt.compare(password, this.password, (err, isMatch) =>
