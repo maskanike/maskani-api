@@ -18,7 +18,7 @@ const sequelize = new Sequelize(
     dialect: config.dialect,
     logging: config.logging,
     pool: {
-      max: 10,
+      max: 5,
       min: 0,
       acquire: 30000,
       idle: 10000
