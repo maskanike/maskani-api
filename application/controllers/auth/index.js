@@ -420,15 +420,16 @@ const forgotPasswordResponse = (item) => {
 const registerUser = async (req) => {
   return new Promise((resolve, reject) => {
     console.log('registerUser: ', req)
-    User.create({
+    const user = {
       name: req.name,
       email: req.email,
       phone: req.phone,
       password: req.password,
       verification: uuid.v4()
-    })
-      .then((user) => {
-        console.log('user: ', user)
+    }
+    User.create(user)
+      .then((item) => {
+        console.log('item: ', item)
         resolve(user)
       })
       .catch((err) => {
