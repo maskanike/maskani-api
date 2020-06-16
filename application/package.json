@@ -8,7 +8,7 @@
     "clean": "./node_modules/.bin/sequelize db:seed:undo:all",
     "seed": "yarn clean && ./node_modules/.bin/sequelize db:seed:all",
     "refresh": "yarn undo-migrate && yarn migrate",
-    "start": "yarn migrate && pm2-runtime app.js",
+    "start": "yarn migrate && nodemon app.js",
     "dev": "yarn migrate && nodemon ./app.js",
     "mocha": "nyc mocha --timeout=5000 --exit",
     "test": "export NODE_ENV=test && yarn refresh && yarn run mocha",
