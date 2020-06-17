@@ -187,7 +187,9 @@ module.exports = {
    */
   async sendRegistrationEmailMessage(user) {
     const subject = 'Verify your email at Maskani'
-    const htmlMessage = `<p>Welcome! To verify your email, please click in this link:</p> <p>${process.env.FRONTEND_URL}/verify/${user.verification}</p> <p>Thank you.</p>`
+    const htmlMessage =
+      `<p>Welcome! To verify your email, please click in this link:</p>` +
+      `<p><a href=${process.env.FRONTEND_URL}/verify/${user.verification}>Verify Email Address</a></p> <p>Thank you.</p>`
     const formattedEmail = formatEmail(htmlMessage, user.name)
     prepareToSendEmail(user, subject, formattedEmail)
   },
@@ -198,7 +200,10 @@ module.exports = {
    */
   async sendResetPasswordEmailMessage(user) {
     const subject = 'Password recovery at Maskani'
-    const htmlMessage = `<p>To recover the password for user: ${user.name}</p> <p>click the following link:</p> <p>${process.env.FRONTEND_URL}/reset/${user.verification}</p> <p>If this was a mistake, you can ignore this message.</p> <p>Thank you.</p>`
+    const htmlMessage =
+      `<p>To recover the password for user: ${user.name}</p>` +
+      `<p>click the following link:</p> <p><a href=${process.env.FRONTEND_URL}/reset/${user.verification}>Recover Password</a></p>` +
+      `<p>If this was a mistake, you can ignore this message.</p> <p>Thank you.</p>`
     const formattedEmail = formatEmail(htmlMessage, user.name)
     prepareToSendEmail(user, subject, formattedEmail)
   },
