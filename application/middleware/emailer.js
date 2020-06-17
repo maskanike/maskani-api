@@ -7,7 +7,7 @@ const Op = Sequelize.Op
 const EMAIL_HEADER =
   '<div style="background-color: #FAFAFA; width: 100%; font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif; box-sizing: border-box; padding-bottom: 25px; margin: 0;">' +
   '<div style="background: transparent; padding-top: 30px; padding-bottom: 20px; text-align: center;">' +
-  '<img style="display: inline-block; height: 30px; width: auto; margin-left: auto; margin-right: auto;" alt="Logo" src="https://maskani.co.ke/assets/img/maskani_logo.png"/>' +
+  '<img style="display: inline-block; height: 30px; width: auto; margin-left: auto; margin-right: auto;" alt="Logo" src="https://maskani.co.ke/img/maskani_logo.png"/>' +
   '</div><div style="background-color: #fff; color: #000; font-size: 1em; border-top: 2px solid #00ACC4; border-bottom: 1px solid #E6E6E6; box-sizing: border-box; padding: 25px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">'
 
 const EMAIL_FOOTER =
@@ -87,27 +87,31 @@ const sendEmail = async (data, callback) => {
 
 /**
  * Prepares to send email
- * @param {string} user - user object
+ * @param {object} user - user object
  * @param {string} subject - subject
  * @param {string} htmlMessage - html message
+ * @param {object} tenant - tenant object. can be null
  */
-const prepareToSendEmail = (user, subject, htmlMessage) => {
-  const from = {
-    name: 'Maskani Team',
-    email: 'info@maskani.co.ke'
+const prepareToSendEmail = (user, subject, htmlMessage, tenant = null) => {
+  let to
+  let from
+
+  if (tenant) {
+    // email sent to tenant from user (agent)
+    from = { name: user.name, email: user.email }
+    to = { name: tenant.name, email: tenant.email }
+  } else {
+    from = { name: 'Maskani Team', email: 'info@maskani.co.ke' }
+    to = { name: user.name, email: user.email, verification: user.verification }
   }
 
-  const to = {
-    name: user.name,
-    email: user.email,
-    verification: user.verification
-  }
   const data = {
     from,
     to,
     subject,
     htmlMessage
   }
+
   if (process.env.NODE_ENV === 'production') {
     sendEmail(data, (messageSent) =>
       messageSent
@@ -120,36 +124,19 @@ const prepareToSendEmail = (user, subject, htmlMessage) => {
 }
 
 /**
- * Prepares to send email
- * @param {string} user - user object
- * @param {string} tenant - tenant object
- * @param {string} subject - subject
- * @param {string} htmlMessage - html message
+ * Format email for sending
+ * @param {string} htmlMessage - html content of email
+ * @param {string} name - name of recepient
  */
-const prepareToSendTenantEmail = (user, tenant, subject, htmlMessage) => {
-  const from = {
-    name: user.name,
-    email: user.email
-  }
-  const to = {
-    name: tenant.name,
-    email: tenant.email
-  }
-  const data = {
-    from,
-    to,
-    subject,
-    htmlMessage
-  }
-  if (process.env.NODE_ENV === 'production') {
-    sendEmail(data, (messageSent) =>
-      messageSent
-        ? console.log(`Email SENT to: ${to.email}`)
-        : console.log(`Email FAILED to: ${to.email}`)
-    )
-  } else if (process.env.NODE_ENV === 'development') {
-    console.log(data)
-  }
+const formatEmail = (htmlMessage, name) => {
+  return (
+    `${EMAIL_HEADER}<p style="margin-bottom: 25px;">Dear ${name},</p>` +
+    `<p style="margin-bottom: 25px;">` +
+    `${htmlMessage}` +
+    '</ul> <br>' +
+    '<p style="margin-top: 10px;">Sincerely,</p> ' +
+    `<p style="margin-top: 2px;">The Maskani Team</p>${EMAIL_FOOTER}`
+  )
 }
 
 module.exports = {
@@ -200,8 +187,9 @@ module.exports = {
    */
   async sendRegistrationEmailMessage(user) {
     const subject = 'Verify your email at Maskani'
-    const htmlMessage = `<p>Hello ${user.name}.</p> <p>Welcome! To verify your email, please click in this link:</p> <p>${process.env.FRONTEND_URL}/verify/${user.verification}</p> <p>Thank you.</p>`
-    prepareToSendEmail(user, subject, htmlMessage)
+    const htmlMessage = `<p>Welcome! To verify your email, please click in this link:</p> <p>${process.env.FRONTEND_URL}/verify/${user.verification}</p> <p>Thank you.</p>`
+    const formattedEmail = formatEmail(htmlMessage, user.name)
+    prepareToSendEmail(user, subject, formattedEmail)
   },
 
   /**
@@ -211,7 +199,8 @@ module.exports = {
   async sendResetPasswordEmailMessage(user) {
     const subject = 'Password recovery at Maskani'
     const htmlMessage = `<p>To recover the password for user: ${user.name}</p> <p>click the following link:</p> <p>${process.env.FRONTEND_URL}/reset/${user.verification}</p> <p>If this was a mistake, you can ignore this message.</p> <p>Thank you.</p>`
-    prepareToSendEmail(user, subject, htmlMessage)
+    const formattedEmail = formatEmail(htmlMessage, user.name)
+    prepareToSendEmail(user, subject, formattedEmail)
   },
 
   /**
@@ -225,8 +214,7 @@ module.exports = {
     const subject = `Your Invoice for ${notificationMetaData.month} - ${notificationMetaData.year} | ${notificationMetaData.flat}`
 
     const htmlMessage =
-      `${EMAIL_HEADER}<p style="margin-bottom: 25px;">Dear ${user.name},</p>` +
-      `<p style="margin-bottom: 25px;">Thank you for being a tenant at <b> ${notificationMetaData.flat} </b> unit  <b> ${notificationMetaData.unit}</b>. ` +
+      `Thank you for being a tenant at <b> ${notificationMetaData.flat} </b> unit  <b> ${notificationMetaData.unit}</b>. ` +
       `Your invoice for ${notificationMetaData.month} ${notificationMetaData.year} is ready.</p>` +
       `<p style="margin-bottom: 25px;">Please pay <b> ${notificationMetaData.totalRentAmount} KSHS</b> before ${invoice.dueDate}.</p> ` +
       '<p style="margin-bottom: 25px;">Your rental breakdown is as follows:</p>' +
@@ -234,12 +222,10 @@ module.exports = {
       `<li class="list-group-item">Rent Due: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.rent}</a></li>` +
       `<li class="list-group-item">Water Bill: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.water}</a></li>` +
       `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage}</a></li>` +
-      `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty}</a></li>` +
-      '</ul>' +
-      '<br>' +
-      '<p style="margin-top: 10px;">Sincerely,</p> ' +
-      `<p style="margin-top: 2px;">The Maskani Team</p>${EMAIL_FOOTER}`
-    prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
+      `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty}</a></li>`
+
+    const formattedEmail = formatEmail(htmlMessage, user.name)
+    prepareToSendEmail(user, subject, formattedEmail, tenant)
   },
 
   /**
@@ -253,15 +239,12 @@ module.exports = {
     const subject = `Your Invoice for ${notificationMetaData.month} - ${notificationMetaData.year} | ${notificationMetaData.flat}`
 
     const htmlMessage =
-      `${EMAIL_HEADER}<p style="margin-bottom: 25px;">Dear ${user.name},</p>` +
-      `<p style="margin-bottom: 25px;">This is a polite reminder to pay your invoice for <b> ${notificationMetaData.month} - ${notificationMetaData.year} </b>` +
+      `This is a polite reminder to pay your invoice for <b> ${notificationMetaData.month} - ${notificationMetaData.year} </b>` +
       `<p style="margin-bottom: 25px;">Kshs <b> ${notificationMetaData.totalRentAmount} KSHS</b> is due on ${notificationMetaData.dueDate}.</p> ` +
       '<p style="margin-bottom: 25px;">Message sent by admin:</p>' +
-      `<p style="margin-bottom: 25px;"><b> ${reminder.message} <b></p>` +
-      '</ul>' +
-      '<br>' +
-      '<p style="margin-top: 10px;">Sincerely,</p> ' +
-      `<p style="margin-top: 2px;">The Maskani Team</p>${EMAIL_FOOTER}`
-    prepareToSendTenantEmail(user, tenant, subject, htmlMessage)
+      `<p style="margin-bottom: 25px;"><b> ${reminder.message} <b></p>`
+
+    const formattedEmail = formatEmail(htmlMessage, user.name)
+    prepareToSendEmail(user, subject, formattedEmail, tenant)
   }
 }
