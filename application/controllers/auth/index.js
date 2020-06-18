@@ -321,11 +321,13 @@ const markResetPasswordAsUsed = async (req, forgot) => {
  */
 const updatePassword = async (password, user) => {
   return new Promise((resolve, reject) => {
-    User.update({ password }, { where: { id: user.id } })
+    User.findByPk(user.id)
       .then((item) => {
         if (!item) {
           reject(utils.buildErrObject(422, 'NOT_FOUND'))
         }
+        item.password = password
+        item.save()
         resolve(item)
       })
       .catch((err) => {
@@ -537,7 +539,6 @@ exports.register = async (req, res) => {
       res.status(201).json(response)
     }
   } catch (error) {
-    console.error('register error: ', error)
     utils.handleError(res, error)
   }
 }

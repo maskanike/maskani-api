@@ -7,12 +7,12 @@ const pgDbObject = {
   host: '127.0.0.1',
   port: '5432',
   dialect: 'postgres',
-  logging: console.log
+  logging: false
 }
 
 module.exports = {
   development: { ...pgDbObject },
   sandbox: { ...pgDbObject },
-  production: { ...pgDbObject, logging: false },
+  production: { ...pgDbObject },
   test: { ...pgDbObject, database: process.env.TEST_DB_NAME }
 }

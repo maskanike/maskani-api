@@ -183,7 +183,14 @@ describe('*********** AUTH ***********', () => {
           res.should.have.status(200)
           res.body.should.be.a('object')
           res.body.should.have.property('msg').eql('PASSWORD_CHANGED')
-          done()
+
+          // test that password stored in the database is not 12345
+          User.findOne({ where: { email: email.toLowerCase() } }).then(
+            (user) => {
+              chai.expect(user.password).to.not.equal('12345')
+              done()
+            }
+          )
         })
     })
   })
