@@ -1,5 +1,5 @@
-const controller = require('../controllers/invoices')
-const validate = require('../controllers/invoices/validate')
+const controller = require('../controllers/receipts')
+const validate = require('../controllers/receipts/validate')
 const AuthController = require('../controllers/auth')
 const express = require('express')
 const router = express.Router()
@@ -71,18 +71,6 @@ router.delete(
   trimRequest.all,
   validate.deleteItem,
   controller.deleteItem
-)
-
-/*
- * Create a reminder to pay an invoice
- */
-router.post(
-  '/:InvoiceId/reminder',
-  requireAuth,
-  AuthController.roleAuthorization(['user', 'admin']),
-  trimRequest.all,
-  validate.sendReminder,
-  controller.sendReminder
 )
 
 module.exports = router

@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   )
   Receipt.associate = (models) => {
     Receipt.belongsTo(models.Tenant)
-    Receipt.belongsTo(models.Unit)
+    Receipt.belongsTo(models.Invoice)
   }
   return Receipt
 }
