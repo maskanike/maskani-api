@@ -27,7 +27,7 @@ exports.getCountry = (req) =>
  */
 exports.handleError = (res, err) => {
   // Prints error in console
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     console.log(err)
   }
   // Sends error to user

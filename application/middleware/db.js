@@ -108,7 +108,7 @@ module.exports = {
   async getItem(id, model) {
     return new Promise((resolve, reject) => {
       model
-        .findById(id)
+        .findByPk(id)
         .then((item) => {
           if (!item) {
             reject(buildErrObject(422, 'NOT_FOUND'))
