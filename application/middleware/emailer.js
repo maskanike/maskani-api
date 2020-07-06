@@ -229,7 +229,7 @@ module.exports = {
       `<li class="list-group-item">Garbage: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.garbage}</a></li>` +
       `<li class="list-group-item">Penalty: <a style="color: #28AFB0; word-wrap: break-word;"> ${invoice.penalty}</a></li>`
 
-    const formattedEmail = formatEmail(htmlMessage, user.name)
+    const formattedEmail = formatEmail(htmlMessage, tenant.name)
     prepareToSendEmail(user, subject, formattedEmail, tenant)
   },
 
@@ -249,7 +249,7 @@ module.exports = {
       '<p style="margin-bottom: 25px;">Message sent by admin:</p>' +
       `<p style="margin-bottom: 25px;"><b> ${reminder.message} <b></p>`
 
-    const formattedEmail = formatEmail(htmlMessage, user.name)
+    const formattedEmail = formatEmail(htmlMessage, tenant.name)
     prepareToSendEmail(user, subject, formattedEmail, tenant)
   }
 }
