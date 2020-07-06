@@ -171,7 +171,7 @@ exports.sendItem = async (req, res) => {
       unit: tenant.unitName
     }
     emailer.sendInvoiceEmail(user, tenant, invoice, notificationMetaData)
-    smser.sendInvoiceSMS(user, notificationMetaData)
+    smser.sendInvoiceSMS(tenant, notificationMetaData)
     res.status(201).json(invoice)
   } catch (error) {
     utils.handleError(res, error)

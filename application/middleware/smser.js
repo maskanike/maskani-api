@@ -139,17 +139,17 @@ module.exports = {
 
   /**
    * Sends invoice sms
-   * @param {object} user - user object
+   * @param {object} tenant - tenant object
    * @param {object} notificationMetaData -  notification meta data
    */
-  async sendInvoiceSMS(user, notificationMetaData) {
+  async sendInvoiceSMS(tenant, notificationMetaData) {
     const message =
-      `Hello ${user.name.split(' ')[0]}! This is an invoice for ${
+      `Hello ${tenant.name.split(' ')[0]}! This is an invoice for ${
         notificationMetaData.unit
       } ` +
       `at ${notificationMetaData.flat} for the period ${notificationMetaData.month} - ${notificationMetaData.year}.\n` +
-      `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${user.email}.`
-    prepareToSendSMS(user, message)
+      `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${tenant.email}.`
+    prepareToSendSMS(tenant, message)
   },
 
   /**
