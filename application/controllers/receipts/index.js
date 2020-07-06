@@ -102,7 +102,7 @@ exports.sendItem = async (req, res) => {
       unit: tenant.unitName
     }
     emailer.sendReceiptEmail(user, tenant, receipt, notificationMetaData)
-    smser.sendReceiptSMS(user, notificationMetaData)
+    smser.sendReceiptSMS(tenant, notificationMetaData)
     res.status(201).json(receipt)
   } catch (error) {
     utils.handleError(res, error)
