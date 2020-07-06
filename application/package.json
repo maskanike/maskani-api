@@ -11,7 +11,7 @@
     "start": "yarn migrate && pm2-runtime app.js",
     "dev": "yarn migrate && nodemon ./app.js",
     "mocha": "nyc mocha --timeout=5000 --exit",
-    "test": "export NODE_ENV=test && yarn refresh && yarn run mocha",
+    "test": "export NODE_ENV=test && yarn refresh && yarn run mocha && yarn clean",
     "format": "prettier --write --config .prettierrc.json \"**/*.js\"",
     "lint": "eslint --fix --config .eslintrc.json \"**/*.js\"",
     "remark": "remark . -o"

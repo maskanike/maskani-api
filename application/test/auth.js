@@ -98,7 +98,7 @@ describe('*********** AUTH ***********', () => {
           res.should.have.status(201)
           res.body.should.be.an('object')
           res.body.should.include.keys('token', 'user')
-          createdID.push(res.body.user._id)
+          createdID.push(res.body.user.id)
           verification = res.body.user.verification
           done()
         })
