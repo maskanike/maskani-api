@@ -1,5 +1,8 @@
 const { buildSuccObject, buildErrObject } = require('../middleware/utils')
 
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+
 /**
  * Builds sorting
  * @param {string} sort - field to sort from
@@ -55,21 +58,20 @@ module.exports = {
           typeof query.fields !== 'undefined'
         ) {
           const data = {
-            $or: []
+            [Op.or]: {}
           }
-          const array = []
+          const { filter, fields } = query
           // Takes fields param and builds an array by splitting with ','
-          const arrayFields = query.fields.split(',')
-          // Adds SQL Like %word% with regex
+          const arrayFields = fields.split(',')
+
+          const array = []
           arrayFields.map((item) => {
             array.push({
-              [item]: {
-                $regex: new RegExp(query.filter, 'i')
-              }
+              [item]: { [Op.like]: `%${filter}%` }
             })
           })
           // Puts array result in data
-          data.$or = array
+          data[Op.or] = array
           resolve(data)
         } else {
           resolve({})

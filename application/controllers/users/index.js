@@ -68,7 +68,7 @@ exports.getItems = async (req, res) => {
 exports.getItem = async (req, res) => {
   try {
     req = matchedData(req)
-    res.status(200).json(await db.getItem(req, models.User))
+    res.status(200).json(await db.getItem(req.id, models.User))
   } catch (error) {
     utils.handleError(res, error)
   }

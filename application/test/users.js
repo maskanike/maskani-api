@@ -83,7 +83,7 @@ describe('*********** USERS ***********', () => {
     it('it should GET the users with filters', (done) => {
       chai
         .request(app)
-        .get('/users?filter=admin&fields=name,email,city,country,phone')
+        .get('/users?filter=admin&fields=name,email,phone')
         .set('Authorization', `Bearer ${tokens.admin}`)
         .end((err, res) => {
           res.should.have.status(200)
@@ -115,11 +115,7 @@ describe('*********** USERS ***********', () => {
         email,
         password: faker.random.words(),
         role: 'admin',
-        urlTwitter: faker.internet.url(),
-        urlGitHub: faker.internet.url(),
-        phone: faker.phone.phoneNumber(),
-        city: faker.random.words(),
-        country: faker.random.words()
+        phone: faker.phone.phoneNumber()
       }
       chai
         .request(app)
@@ -175,7 +171,6 @@ describe('*********** USERS ***********', () => {
   })
   describe('/GET/:id user', () => {
     it('it should GET a user by the given id', (done) => {
-      console.log(createdID)
       const id = createdID.slice(-1).pop()
 
       chai
@@ -198,11 +193,7 @@ describe('*********** USERS ***********', () => {
         name: 'JS123456',
         email: 'emailthatalreadyexists@email.com',
         role: 'admin',
-        urlTwitter: faker.internet.url(),
-        urlGitHub: faker.internet.url(),
-        phone: faker.phone.phoneNumber(),
-        city: faker.random.words(),
-        country: faker.random.words()
+        phone: faker.phone.phoneNumber()
       }
       chai
         .request(app)

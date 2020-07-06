@@ -59,20 +59,6 @@ describe('*********** FLATS ***********', () => {
           done()
         })
     })
-    it('it should GET the flats with filters', (done) => {
-      chai
-        .request(app)
-        .get('/cities?filter=Bucaramanga&fields=name')
-        .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          res.should.have.status(200)
-          res.body.should.be.an('object')
-          res.body.docs.should.be.a('array')
-          res.body.docs.should.have.lengthOf(1)
-          res.body.docs[0].should.have.property('name').eql('Bucaramanga')
-          done()
-        })
-    })
   })
 
   describe('/POST flat', () => {
@@ -120,6 +106,19 @@ describe('*********** FLATS ***********', () => {
           res.should.have.status(422)
           res.body.should.be.a('object')
           res.body.should.have.property('errors')
+          done()
+        })
+    })
+    it('it should GET the flats with filters', (done) => {
+      chai
+        .request(app)
+        .get(`/flats?filter=${name}&fields=name`)
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          res.should.have.status(200)
+          res.body.should.be.an('array')
+          res.body.should.have.lengthOf(1)
+          res.body[0].should.have.property('name').eql(name)
           done()
         })
     })
@@ -175,14 +174,14 @@ describe('*********** FLATS ***********', () => {
           res.body.should.include.keys('id', 'name')
           res.body.should.have.property('name').eql(repeatedName)
           createdID.push(res.body.id)
-          const anotherCity = {
+          const anotherFlat = {
             name: newName
           }
           chai
             .request(app)
             .patch(`/flats/${createdID.slice(-1).pop()}`)
             .set('Authorization', `Bearer ${token}`)
-            .send(anotherCity)
+            .send(anotherFlat)
             .end((error, result) => {
               result.should.have.status(422)
               result.body.should.be.a('object')
