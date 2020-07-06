@@ -200,4 +200,15 @@ describe('*********** AUTH ***********', () => {
         })
     })
   })
+
+  after(() => {
+    createdID.forEach((id) => {
+      User.destroy({ where: { id } }, (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+    })
+    ForgotPassword.destroy({ where: {} })
+  })
 })
