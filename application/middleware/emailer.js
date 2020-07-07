@@ -234,6 +234,24 @@ module.exports = {
   },
 
   /**
+   * Sends receipt email
+   * @param {object} user - user object
+   * @param {object} tenant - tenant object
+   * @param {object} receipt - receipt object
+   * @param {object} notificationMetaData - metadata used to send notification
+   */
+  async sendReceiptEmail(user, tenant, receipt, notificationMetaData) {
+    const subject = `Your Receipt for Invoice ${receipt.invoice.id} | ${notificationMetaData.flat}`
+
+    const htmlMessage =
+      `Thank you for being a tenant at <b> ${notificationMetaData.flat} </b> unit  <b> ${notificationMetaData.unit}</b>. ` +
+      `Your payment for Invoice ${receipt.invoice.id} of amount <b> ${receipt.amount}  KSHS</b> has been received.</p>`
+
+    const formattedEmail = formatEmail(htmlMessage, user.name)
+    prepareToSendEmail(user, subject, formattedEmail, tenant)
+  },
+
+  /**
    * Sends reminder email
    * @param {object} user - user object
    * @param {object} tenant - tenant object

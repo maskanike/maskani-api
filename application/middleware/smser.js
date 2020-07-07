@@ -154,18 +154,18 @@ module.exports = {
 
   /**
    * Sends Reminder sms
-   * @param {object} user - user object
+   * @param {object} tenant - tenant object
    * @param {object} notificationMetaData - notification meta data
    */
-  async sendReminderSMS(user, notificationMetaData) {
+  async sendReminderSMS(tenant, notificationMetaData) {
     const message =
       `Hello ${
-        user.name.split(' ')[0]
+        tenant.name.split(' ')[0]
       }! This is a polite reminder of your invoice ${
         notificationMetaData.month
       } - ${notificationMetaData.year}` +
       ` by ${notificationMetaData.flat}.\n` +
-      `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${user.email}.`
-    prepareToSendSMS(user, message)
+      `TOTAL: ${notificationMetaData.totalRentAmount}\nSent to your email ${tenant.email}.`
+    prepareToSendSMS(tenant, message)
   }
 }

@@ -35,47 +35,9 @@ exports.sendItem = [
 ]
 
 /**
- * Validates update item request
- */
-exports.updateItem = [
-  check('amount')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY')
-    .isNumeric()
-    .withMessage('AMOUNT_IS_NOT_VALID'),
-  check('id')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
-  (req, res, next) => {
-    validationResult(req, res, next)
-  }
-]
-
-/**
  * Validates get item request
  */
 exports.getItem = [
-  check('id')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
-  (req, res, next) => {
-    validationResult(req, res, next)
-  }
-]
-
-/**
- * Validates delete item request
- */
-exports.deleteItem = [
   check('id')
     .exists()
     .withMessage('MISSING')

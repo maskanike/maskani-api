@@ -2,7 +2,7 @@
 
 process.env.NODE_ENV = 'test'
 
-const { Reminder } = require('../models')
+const { Receipt } = require('../models')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const app = require('../app')
@@ -17,9 +17,9 @@ const createdID = []
 
 chai.use(chaiHttp)
 
-describe('*********** INVOICE ***********', () => {
+describe('*********** RECEIPT ***********', () => {
   after(() => {
-    Reminder.destroy({ where: {} })
+    Receipt.destroy({ where: {} })
   })
 
   describe('/POST login', () => {
@@ -37,81 +37,58 @@ describe('*********** INVOICE ***********', () => {
         })
     })
   })
-  describe('/POST invoices/', () => {
-    it('it should create an invoice', (done) => {
+  describe('/POST receipts/', () => {
+    it('it should create an receipt', (done) => {
       const data = {
-        rent: 2000,
-        penalty: 100,
-        garbage: 150,
-        water: 200,
+        amount: 2200,
         TenantId: 1,
-        UnitId: 1,
-        dueDate: '2020-09-10'
+        InvoiceId: 1
       }
       chai
         .request(app)
-        .post('/invoices')
+        .post('/receipts')
         .set('Authorization', `Bearer ${token}`)
         .send(data)
         .end((err, res) => {
           res.should.have.status(201)
           res.body.should.be.a('object')
-          res.body.should.have.property('rent').eql(data.rent)
-          res.body.should.have.property('water').eql(data.water)
-          createdID.push(res.body.id)
-          done()
-        })
-    })
-    it('it should create a reminder for invoice', (done) => {
-      const data = {
-        message: 'please pay',
-        InvoiceId: createdID[0]
-      }
-      chai
-        .request(app)
-        .post('/invoices/reminder')
-        .set('Authorization', `Bearer ${token}`)
-        .send(data)
-        .end((err, res) => {
-          res.should.have.status(201)
-          res.body.should.be.a('object')
-          res.body.should.have.property('message').eql(data.message)
+          res.body.should.have.property('amount').eql(data.amount)
           createdID.push(res.body.id)
           done()
         })
     })
   })
-  describe('/GET invoice', () => {
+  describe('/GET receipt', () => {
     it('it should NOT be able to consume the route since no token was sent', (done) => {
       chai
         .request(app)
-        .get('/invoices')
+        .get('/receipts')
         .end((err, res) => {
           res.should.have.status(401)
           done()
         })
     })
-    it('it should GET profile', (done) => {
+    it('it should GET receipts', (done) => {
       chai
         .request(app)
-        .get('/invoices')
+        .get('/receipts')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)
           res.body.should.be.an('array')
-          res.body[0].should.include.keys('rent', 'water')
+          res.body[0].should.include.keys('amount')
           done()
         })
     })
-    it('it should GET profile given ID', (done) => {
+    it('it should GET receipts given ID', (done) => {
       chai
         .request(app)
-        .get(`/invoices/${createdID[0]}`)
+        .get(`/receipts/${createdID[0]}`)
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200)
           res.body.should.be.an('object')
-          res.body.should.include.keys('rent', 'water')
+          res.body.should.include.keys('amount')
           done()
         })
     })

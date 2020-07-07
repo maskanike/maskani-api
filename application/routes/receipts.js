@@ -29,7 +29,7 @@ router.get(
  * Create new item route
  */
 router.post(
-  '/:TenantId',
+  '/',
   requireAuth,
   AuthController.roleAuthorization(['user', 'admin']),
   trimRequest.all,
@@ -47,30 +47,6 @@ router.get(
   trimRequest.all,
   validate.getItem,
   controller.getItem
-)
-
-/*
- * Update item route
- */
-router.patch(
-  '/:id',
-  requireAuth,
-  AuthController.roleAuthorization(['user', 'admin']),
-  trimRequest.all,
-  validate.updateItem,
-  controller.updateItem
-)
-
-/*
- * Delete item route
- */
-router.delete(
-  '/:id',
-  requireAuth,
-  AuthController.roleAuthorization(['user', 'admin']),
-  trimRequest.all,
-  validate.deleteItem,
-  controller.deleteItem
 )
 
 module.exports = router

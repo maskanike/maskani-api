@@ -69,21 +69,6 @@ exports.getItem = async (req, res) => {
 }
 
 /**
- * Update item function called by route
- * @param {Object} req - request object
- * @param {Object} res - response object
- */
-exports.updateItem = async (req, res) => {
-  try {
-    req = matchedData(req)
-    const { id } = req
-    res.status(200).json(await db.updateItem(id, Flat, req))
-  } catch (error) {
-    utils.handleError(res, error)
-  }
-}
-
-/**
  * Create item function called by route
  * @param {Object} req - request object
  * @param {Object} res - response object
@@ -95,29 +80,12 @@ exports.sendItem = async (req, res) => {
     const receipt = await db.createItem(req, Receipt)
     const tenant = await updateTenantObject(req, receipt.id)
     const notificationMetaData = {
-      month: receipt.dueDate.toLocaleString('en-us', { month: 'short' }),
-      year: getYear(receipt.dueDate),
-      amount: req.amount,
       flat: tenant.flatName,
       unit: tenant.unitName
     }
     emailer.sendReceiptEmail(user, tenant, receipt, notificationMetaData)
     smser.sendReceiptSMS(tenant, notificationMetaData)
     res.status(201).json(receipt)
-  } catch (error) {
-    utils.handleError(res, error)
-  }
-}
-
-/**
- * Delete item function called by route
- * @param {Object} req - request object
- * @param {Object} res - response object
- */
-exports.deleteItem = async (req, res) => {
-  try {
-    req = matchedData(req)
-    res.status(200).json(await db.deleteItem(req.id, Receipt))
   } catch (error) {
     utils.handleError(res, error)
   }
