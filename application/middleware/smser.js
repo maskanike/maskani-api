@@ -153,6 +153,20 @@ module.exports = {
   },
 
   /**
+   * Sends receipt sms
+   * @param {object} tenant - tenant object
+   * @param {object} notificationMetaData -  notification meta data
+   */
+  async sendReceiptSMS(tenant, notificationMetaData) {
+    const message =
+      `Hello ${tenant.name.split(' ')[0]}! Thank you for your payment of ${
+        notificationMetaData.amount
+      } ` +
+      `at ${notificationMetaData.flat}\nWe have sent a copy of the receipt to your email ${tenant.email}.`
+    prepareToSendSMS(tenant, message)
+  },
+
+  /**
    * Sends Reminder sms
    * @param {object} tenant - tenant object
    * @param {object} notificationMetaData - notification meta data
