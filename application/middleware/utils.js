@@ -44,7 +44,6 @@ exports.handleError = (res, err) => {
  * @param {string} message - error text
  */
 exports.buildErrObject = (code, message) => {
-  console.log(code, message)
   return {
     code,
     message
