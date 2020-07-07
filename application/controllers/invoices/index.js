@@ -81,21 +81,6 @@ exports.getItem = async (req, res) => {
 }
 
 /**
- * Update item function called by route
- * @param {Object} req - request object
- * @param {Object} res - response object
- */
-exports.updateItem = async (req, res) => {
-  try {
-    req = matchedData(req)
-    const { id } = req
-    res.status(200).json(await db.updateItem(id, Flat, req))
-  } catch (error) {
-    utils.handleError(res, error)
-  }
-}
-
-/**
  * Create item function called by route
  * @param {Object} req - request object
  * @param {Object} res - response object
@@ -147,20 +132,6 @@ exports.sendReminder = async (req, res) => {
     emailer.sendReminderEmail(user, tenant, reminder, notificationMetaData)
     smser.sendReminderSMS(user, notificationMetaData)
     res.status(201).json(reminder)
-  } catch (error) {
-    utils.handleError(res, error)
-  }
-}
-
-/**
- * Delete item function called by route
- * @param {Object} req - request object
- * @param {Object} res - response object
- */
-exports.deleteItem = async (req, res) => {
-  try {
-    req = matchedData(req)
-    res.status(200).json(await db.deleteItem(req.id, Invoice))
   } catch (error) {
     utils.handleError(res, error)
   }
