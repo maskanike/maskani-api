@@ -14,7 +14,9 @@
     "test": "export NODE_ENV=test && yarn refresh && yarn run mocha",
     "format": "prettier --write --config .prettierrc.json \"**/*.js\"",
     "lint": "eslint --fix --config .eslintrc.json \"**/*.js\"",
-    "remark": "remark . -o"
+    "remark": "remark . -o",
+    "snyk-protect": "snyk protect",
+    "prepare": "yarn run snyk-protect"
   },
   "husky": {
     "hooks": {
@@ -43,7 +45,8 @@
     "sequelize": "^5.21.13",
     "sequelize-cli": "^5.5.1",
     "trim-request": "^1.0.6",
-    "uuid": "^8.1.0"
+    "uuid": "^8.1.0",
+    "snyk": "^1.360.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -60,5 +63,6 @@
     "prettier": "^2.0.5",
     "prettier-eslint": "^11.0.0",
     "remark-cli": "^8.0.0"
-  }
+  },
+  "snyk": true
 }
