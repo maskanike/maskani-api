@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         beforeCreate: (user) => hashPassword(user),
+        beforeBulkCreate: (users) =>
+          users.forEach((user) => {
+            hashPassword(user)
+          }),
         beforeUpdate: (user) => hashPassword(user)
       }
     }

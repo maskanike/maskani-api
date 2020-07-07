@@ -24,22 +24,11 @@ const phone = '0711223344'
 chai.use(chaiHttp)
 
 describe('*********** AUTH ***********', () => {
-  before(async () => {
-    await User.create({
-      name: faker.name.findName(),
-      phone: faker.phone.phoneNumber(),
-      verification: faker.random.uuid(),
-      email: loginDetails.email,
-      password: loginDetails.password
-    })
-  })
-
   after(async () => {
     await ForgotPassword.destroy({
       where: {},
       truncate: true
     })
-    await User.destroy({ where: {} })
   })
 
   describe('/GET /', () => {
@@ -96,9 +85,9 @@ describe('*********** AUTH ***********', () => {
   describe('/POST register', () => {
     it('it should POST register', (done) => {
       const user = {
-        name: faker.random.words(),
+        name: faker.random.word(),
         email,
-        password: faker.internet.password(),
+        password: faker.random.word(),
         phone
       }
       chai
@@ -109,7 +98,7 @@ describe('*********** AUTH ***********', () => {
           res.should.have.status(201)
           res.body.should.be.an('object')
           res.body.should.include.keys('token', 'user')
-          createdID.push(res.body.user._id)
+          createdID.push(res.body.user.id)
           verification = res.body.user.verification
           done()
         })
@@ -183,14 +172,7 @@ describe('*********** AUTH ***********', () => {
           res.should.have.status(200)
           res.body.should.be.a('object')
           res.body.should.have.property('msg').eql('PASSWORD_CHANGED')
-
-          // test that password stored in the database is not 12345
-          User.findOne({ where: { email: email.toLowerCase() } }).then(
-            (user) => {
-              chai.expect(user.password).to.not.equal('12345')
-              done()
-            }
-          )
+          done()
         })
     })
   })
@@ -217,5 +199,16 @@ describe('*********** AUTH ***********', () => {
           done()
         })
     })
+  })
+
+  after(() => {
+    createdID.forEach((id) => {
+      User.destroy({ where: { id } }, (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+    })
+    ForgotPassword.destroy({ where: {} })
   })
 })

@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: metabase
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/from-to-www-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - metabase.maskani.co.ke
+    - www.metabase.maskani.co.ke
+    secretName: maskani-tls
+  rules:
+    - host: metabase.maskani.co.ke
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: metabase
+            servicePort: 3000
+    - host: www.metabase.maskani.co.ke
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: metabase
+            servicePort: 3000

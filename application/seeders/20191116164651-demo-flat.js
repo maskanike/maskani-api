@@ -4,7 +4,6 @@ module.exports = {
       'Flats',
       [
         {
-          id: 1,
           name: 'Watercress Woods',
           paymentDetails: '00001000010000',
           UserId: 1,

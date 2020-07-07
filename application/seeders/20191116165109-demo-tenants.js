@@ -4,7 +4,8 @@ module.exports = {
       'Tenants',
       [
         {
-          id: 1,
+          name: 'sam',
+          email: 'samuel@flatspad.com',
           rent: 20000,
           deposit: 25000,
           balance: 0,
@@ -13,11 +14,9 @@ module.exports = {
           penalty: 100,
           createdAt: new Date(),
           updatedAt: new Date(),
-          UserId: 1,
           FlatId: 1
         },
         {
-          id: 2,
           rent: 10000,
           deposit: 15000,
           balance: 0,
@@ -26,11 +25,11 @@ module.exports = {
           penalty: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-          UserId: 2,
+          name: 'joan',
+          email: 'joan@flatspad.com',
           FlatId: 1
         },
         {
-          id: 3,
           rent: 12000,
           deposit: 17000,
           balance: 0,
@@ -39,7 +38,8 @@ module.exports = {
           penalty: 10,
           createdAt: new Date(),
           updatedAt: new Date(),
-          UserId: 3,
+          name: 'Jane Doe',
+          email: 'jane@example.com',
           FlatId: 1
         }
       ],

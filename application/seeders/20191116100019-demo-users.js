@@ -1,53 +1,28 @@
 const uuid = require('uuid')
+const { User } = require('../models')
 
 module.exports = {
-  up: async (queryInterface) => {
-    const password = '12345678'
-    return queryInterface.bulkInsert('Users', [
+  up: async () => {
+    const password = '12345'
+    return User.bulkCreate([
       {
-        id: 1,
-        email: 'samuel@flatspad.com',
-        phone: '254723453841',
+        email: 'admin@admin.com',
+        msisdn: '254723453841',
         password,
+        role: 'admin',
         name: 'Samuel Magondu',
         status: 'active',
-        role: 'landlord',
         verification: uuid.v4(),
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        id: 2,
-        email: 'magondunjenga@gmail.com',
-        phone: '254713849874',
+        email: 'user@user.com',
+        msisdn: '254713849874',
         password,
+        role: 'user',
         name: 'Magondu Njenga',
         status: 'active',
-        role: 'tenant',
-        verification: uuid.v4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 3,
-        email: 'eugenenyawara@gmail.com',
-        phone: '254725902510',
-        password,
-        name: 'Eugene Nyawara',
-        status: 'active',
-        role: 'tenant',
-        verification: uuid.v4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 4,
-        email: 'magonduback@gmail.com',
-        phone: '254723453841',
-        password,
-        name: 'Magondu Back',
-        status: 'active',
-        role: 'tenant',
         verification: uuid.v4(),
         createdAt: new Date(),
         updatedAt: new Date()

@@ -4,7 +4,6 @@ module.exports = {
       'Units',
       [
         {
-          id: 1,
           name: '3E/07',
           status: 'active',
           createdAt: new Date(),
@@ -13,7 +12,6 @@ module.exports = {
           TenantId: 2
         },
         {
-          id: 2,
           name: '3E/01',
           status: 'active',
           createdAt: new Date(),
@@ -22,7 +20,6 @@ module.exports = {
           TenantId: 3
         },
         {
-          id: 3,
           name: '3E/02',
           status: 'active',
           createdAt: new Date(),
@@ -30,7 +27,6 @@ module.exports = {
           FlatId: 1
         },
         {
-          id: 4,
           name: '3E/03',
           status: 'active',
           FlatId: 1,
