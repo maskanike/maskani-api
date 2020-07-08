@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       water: DataTypes.INTEGER,
       garbage: DataTypes.INTEGER,
       penalty: DataTypes.INTEGER,
+      amountPaid: { type: DataTypes.INTEGER, defaultValue: 0 },
       dueDate: DataTypes.DATE,
       status: {
         type: DataTypes.ENUM('paid', 'unpaid', 'partially_paid'),

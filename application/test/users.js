@@ -2,8 +2,6 @@
 
 process.env.NODE_ENV = 'test'
 
-const { User } = require('../models')
-
 const faker = require('faker')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
@@ -256,7 +254,7 @@ describe('*********** USERS ***********', () => {
       const user = {
         name: faker.random.words(),
         email: faker.internet.email(),
-        password: faker.random.words(),
+        password: faker.internet.password(8),
         role: 'admin',
         phone: faker.phone.phoneNumber()
       }

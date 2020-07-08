@@ -87,7 +87,7 @@ describe('*********** AUTH ***********', () => {
       const user = {
         name: faker.random.word(),
         email,
-        password: faker.random.word(),
+        password: faker.internet.password(8),
         phone
       }
       chai
@@ -107,7 +107,7 @@ describe('*********** AUTH ***********', () => {
       const user = {
         name: faker.random.words(),
         email,
-        password: faker.random.words(),
+        password: faker.internet.password(8),
         phone
       }
       chai

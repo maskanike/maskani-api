@@ -1,11 +1,10 @@
-const { Flat, Receipt, Tenant } = require('../../models')
+const { Invoice, Receipt, Tenant } = require('../../models')
 
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
 const db = require('../../middleware/db')
 const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
-const { getYear } = require('date-fns')
 
 /*********************
  * Private functions *
@@ -33,6 +32,27 @@ const updateTenantObject = async (req, lastReceiptSentId) => {
       .catch((err) => {
         reject(utils.buildErrObject(422, err.message))
       })
+  })
+}
+
+/**
+ * Update tenant object
+ * @param {object} amount - amount paid
+ * @param {number} InvoiceId - Id of which payment is being made
+ */
+const updateInvoiceObject = async (amount, InvoiceId) => {
+  return new Promise((resolve, reject) => {
+    Invoice.findByPk(InvoiceId).then((invoice) => {
+      invoice.amountPaid += Number(amount)
+      invoice
+        .save()
+        .then(() => {
+          resolve(true)
+        })
+        .catch((err) => {
+          reject(utils.buildErrObject(422, err.message))
+        })
+    })
   })
 }
 
@@ -79,6 +99,8 @@ exports.sendItem = async (req, res) => {
     req = matchedData(req)
     const receipt = await db.createItem(req, Receipt)
     const tenant = await updateTenantObject(req, receipt.id)
+    await updateInvoiceObject(req.amount, receipt.InvoiceId)
+
     const notificationMetaData = {
       flat: tenant.flatName,
       unit: tenant.unitName,
