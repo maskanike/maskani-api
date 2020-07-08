@@ -11,7 +11,7 @@ const requireAuth = passport.authenticate('jwt', {
 const trimRequest = require('trim-request')
 
 /*
- * Invoices routes
+ * Receipts routes
  */
 
 /*

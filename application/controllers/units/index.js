@@ -173,7 +173,10 @@ exports.createUnitWithTenant = async (req, res) => {
     req = matchedData(req)
     const doesUnitExists = await unitExists(req.unitName)
     if (!doesUnitExists) {
-      const tenant = await db.createItem({ ...req, FlatId: flat.id }, Tenant)
+      const tenant = await db.createItem(
+        { ...req, flatName: flat.name, FlatId: flat.id },
+        Tenant
+      )
       const unit = await createUnit(req.unitName, flat.id, tenant.id)
       res.status(201).json(unit)
     }

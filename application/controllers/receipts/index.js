@@ -81,9 +81,11 @@ exports.sendItem = async (req, res) => {
     const tenant = await updateTenantObject(req, receipt.id)
     const notificationMetaData = {
       flat: tenant.flatName,
-      unit: tenant.unitName
+      unit: tenant.unitName,
+      amount: receipt.amount,
+      InvoiceId: receipt.InvoiceId
     }
-    emailer.sendReceiptEmail(user, tenant, receipt, notificationMetaData)
+    emailer.sendReceiptEmail(user, tenant, notificationMetaData)
     smser.sendReceiptSMS(tenant, notificationMetaData)
     res.status(201).json(receipt)
   } catch (error) {
