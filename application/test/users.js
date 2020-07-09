@@ -111,7 +111,7 @@ describe('*********** USERS ***********', () => {
       const user = {
         name: faker.random.words(),
         email,
-        password: faker.random.words(),
+        password: faker.internet.password(8),
         role: 'admin',
         phone: faker.phone.phoneNumber()
       }
@@ -132,7 +132,7 @@ describe('*********** USERS ***********', () => {
       const user = {
         name: faker.random.words(),
         email,
-        password: faker.random.words(),
+        password: faker.internet.password(8),
         role: 'admin'
       }
       chai
@@ -151,7 +151,7 @@ describe('*********** USERS ***********', () => {
       const user = {
         name: faker.random.words(),
         email,
-        password: faker.random.words(),
+        password: faker.internet.password(8),
         role: faker.random.words()
       }
       chai

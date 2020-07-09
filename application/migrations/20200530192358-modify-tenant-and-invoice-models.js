@@ -43,14 +43,14 @@ module.exports = {
         transaction
       })
       await queryInterface.sequelize.query(
-        queryInterface.QueryGenerator.pgEnumDrop('Tenants', 'paymentStatus'),
+        queryInterface.queryGenerator.pgEnumDrop('Tenants', 'paymentStatus'),
         { transaction }
       )
 
       await queryInterface.removeColumn('Invoices', 'dueDate', { transaction })
       await queryInterface.removeColumn('Invoices', 'status', { transaction })
       await queryInterface.sequelize.query(
-        queryInterface.QueryGenerator.pgEnumDrop('Invoices', 'status'),
+        queryInterface.queryGenerator.pgEnumDrop('Invoices', 'status'),
         { transaction }
       )
       await transaction.commit()

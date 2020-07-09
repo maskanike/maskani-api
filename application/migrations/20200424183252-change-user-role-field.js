@@ -9,7 +9,7 @@ module.exports = {
         { transaction }
       )
       await queryInterface.sequelize.query(
-        queryInterface.QueryGenerator.pgEnumDrop('Users', 'role'),
+        queryInterface.queryGenerator.pgEnumDrop('Users', 'role'),
         { transaction }
       )
 
@@ -50,7 +50,7 @@ module.exports = {
         { transaction }
       )
       await queryInterface.sequelize.query(
-        queryInterface.QueryGenerator.pgEnumDrop('Users', 'role'),
+        queryInterface.queryGenerator.pgEnumDrop('Users', 'role'),
         { transaction }
       )
       await queryInterface.changeColumn(
@@ -65,7 +65,7 @@ module.exports = {
 
       await queryInterface.removeColumn('Users', 'userType', { transaction })
       await queryInterface.sequelize.query(
-        queryInterface.QueryGenerator.pgEnumDrop('Users', 'userType'),
+        queryInterface.queryGenerator.pgEnumDrop('Users', 'userType'),
         { transaction }
       )
 
