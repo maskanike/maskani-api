@@ -178,3 +178,18 @@ exports.deleteItem = [
     validationResult(req, res, next)
   }
 ]
+
+/**
+ * Tenant moved out
+ */
+exports.movedOut = [
+  check('id')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY'),
+  (req, res, next) => {
+    validationResult(req, res, next)
+  }
+]

@@ -61,6 +61,18 @@ router.get(
 )
 
 /*
+ * Mark Tenant as Moved out
+ */
+router.patch(
+  '/movedout',
+  requireAuth,
+  AuthController.roleAuthorization(['user', 'admin']),
+  trimRequest.all,
+  validate.movedOut,
+  controller.movedOut
+)
+
+/*
  * Update item route
  */
 router.patch(
