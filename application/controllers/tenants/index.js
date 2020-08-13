@@ -74,6 +74,41 @@ const assignTenantToUnit = async (TenantId, unitId) => {
 }
 
 /**
+ * Mark unit as empty belong to tenant
+ * @param {number} TenantId - id of tenant
+ */
+const markUnitAsEmpty = async (TenantId) => {
+  return new Promise((resolve, reject) => {
+    Unit.update({ TenantId: null }, { where: { TenantId } })
+      .then(async () => {
+        resolve(true)
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
+  })
+}
+
+/**
+ * Mark tenant as moved out
+ * @param {number} id - id of tenant
+ */
+const markTenantAsMovedOut = async (id) => {
+  return new Promise((resolve, reject) => {
+    Tenant.update(
+      { status: 'left' },
+      { where: { id }, returning: true, plain: true }
+    )
+      .then(async (tenant) => {
+        resolve(tenant[1])
+      })
+      .catch((err) => {
+        reject(utils.buildErrObject(422, err.message))
+      })
+  })
+}
+
+/**
  * Gets all items from database
  * @param {number} FlatId - email of tenant
  */
@@ -180,12 +215,8 @@ exports.createItem = async (req, res) => {
         { ...req, FlatId: flat.id, flatName: flat.name },
         Tenant
       )
-      const updatedTenant = await assignTenantToUnit(
-        tenant.id,
-        req.UnitId,
-        flat.id
-      )
-      res.status(201).json(updatedTenant)
+      await assignTenantToUnit(tenant.id, req.UnitId, flat.id)
+      res.status(201).json(tenant)
     }
   } catch (error) {
     utils.handleError(res, error)
@@ -201,6 +232,22 @@ exports.deleteItem = async (req, res) => {
   try {
     req = matchedData(req)
     res.status(200).json(await db.deleteItem(req.id, Tenant))
+  } catch (error) {
+    utils.handleError(res, error)
+  }
+}
+
+/**
+ * Mark tenant as moved out function
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ */
+exports.movedOut = async (req, res) => {
+  try {
+    req = matchedData(req)
+    const tenant = await markTenantAsMovedOut(req.id)
+    await markUnitAsEmpty(req.id)
+    res.status(200).json(tenant)
   } catch (error) {
     utils.handleError(res, error)
   }
