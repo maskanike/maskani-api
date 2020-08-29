@@ -1,4 +1,4 @@
-const { Flat, Invoice, Tenant, Reminder, Sequelize } = require('../../models')
+const { Invoice, Tenant, Reminder } = require('../../models')
 
 const { matchedData } = require('express-validator')
 const utils = require('../../middleware/utils')
@@ -7,8 +7,6 @@ const emailer = require('../../middleware/emailer')
 const smser = require('../../middleware/smser')
 const { getInvoice, getTenant } = require('../utils')
 const { getYear } = require('date-fns')
-
-const Op = Sequelize.Op
 
 /*********************
  * Private functions *
