@@ -27,14 +27,14 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 17.11.0-ce
+          version: 19.03.13
       - run:
           name: Setup Namespace
           command: |
             echo 'export IMAGE_TAG=gcr.io/${PROJECT_NAME}/${APP_NAME}:${CIRCLE_BRANCH/\//-}.${CIRCLE_BUILD_NUM}' >> $BASH_ENV
             if [ "${CIRCLE_BRANCH}" == "dev" ]; then
               echo 'export NAMESPACE=staging' >> $BASH_ENV
-            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+            elif [ "${CIRCLE_BRANCH}" == "prod" ]; then
               echo 'export NAMESPACE=production' >> $BASH_ENV
               sed -i.bak "s#replicas: 1#replicas: ${REPLICAS}#" kubernetes/deployments/deployment.yaml
             elif [[ -f .deploy-to-sandbox ]]; then
