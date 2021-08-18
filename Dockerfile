@@ -1,4 +1,4 @@
-FROM node:16.1-slim
+FROM node:16.4-slim
 LABEL maintainer="Samuel Magondu <samuel@maskani.co.ke>"
 
 WORKDIR /www
